@@ -74,3 +74,19 @@ Reflection
 This structure keeps code modular and scalable, allowing team members to work independently on routes, components, and  logic. It supports future feature additions and smooth maintenance.
 
 ![Local app running](./screenshot.png)
+
+## TypeScript & ESLint Configuration
+
+Strict TypeScript Mode
+Ensures better type safety and reduces runtime errors by enforcing strict rules like noImplicitAny, noUnusedLocals, and consistent casing.
+
+ESLint + Prettier Setup
+
+ESLint detects code issues and ensures best practices.
+
+Prettier automatically formats code for readability.
+
+Configurations enforce semicolons, double quotes, and prevent console logs.
+
+Pre-Commit Hooks (Husky + lint-staged)
+Automatically runs lint and formatting checks before commits, ensuring all code entering the repo is clean and consistent.
