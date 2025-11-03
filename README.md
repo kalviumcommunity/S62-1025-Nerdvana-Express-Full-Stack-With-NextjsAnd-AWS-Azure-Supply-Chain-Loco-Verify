@@ -71,6 +71,6 @@ Visit http://localhost:3000
 
 Reflection
 
-This structure keeps code modular and scalable, allowing team members to work independently on routes, components, and backend logic. It supports future feature additions and smooth maintenance.
+This structure keeps code modular and scalable, allowing team members to work independently on routes, components, and  logic. It supports future feature additions and smooth maintenance.
 
 ![Local app running](./screenshot.png)
