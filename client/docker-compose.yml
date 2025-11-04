@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  app:
+    # Build from the local Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nextjs_app
+    ports:
+      - "3000:3000"
+    # Mount the source code for hot reloading during development
+    # REMOVE this volume mount for production deployment!
+    volumes:
+      - .:/app
+      - /app/node_modules # Keep node_modules separate
+    environment:
+      # These must match the service names in this compose file
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: development # Override to run 'npm run dev' locally
+    depends_on:
+      - db
+      - redis
+    networks:
+      - localnet
+    # Override the command to use the development server for watch/hot reload
+    command: npm run dev
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Expose DB port to host for external clients (optional)
+    networks:
+      - localnet
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379" # Expose Redis port to host (optional)
+    networks:
+      - localnet
+
+networks:
+  localnet:
+    driver: bridge
+
+volumes:
+  db_data:
