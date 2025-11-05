@@ -1,4 +1,6 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged
+echo "🔍 Running ESLint in client/src..."
+cd client
+npx eslint "src/**/*.{js,jsx,ts,tsx}" --fix

@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 52, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Sera%20Shine/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/src/app/api/test/route.ts"],"sourcesContent":["import { NextResponse } from \"next/server\";\r\nimport { PrismaClient } from \"@prisma/client\";\r\n\r\nconst prisma = new PrismaClient();\r\n\r\nexport async function GET() {\r\n  try {\r\n    await prisma.$connect();\r\n    return NextResponse.json({ message: \"✅ Prisma connection successful!\" });\r\n  } catch (error) {\r\n    console.error(\"❌ Prisma connection error:\", error);\r\n    return NextResponse.json({ error: \"Database connection failed\" }, { status: 500 });\r\n  } finally {\r\n    await prisma.$disconnect();\r\n  }\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEA,MAAM,SAAS,IAAI,6IAAY;AAExB,eAAe;IACpB,IAAI;QACF,MAAM,OAAO,QAAQ;QACrB,OAAO,sSAAY,CAAC,IAAI,CAAC;YAAE,SAAS;QAAkC;IACxE,EAAE,OAAO,OAAO;QACd,QAAQ,KAAK,CAAC,8BAA8B;QAC5C,OAAO,sSAAY,CAAC,IAAI,CAAC;YAAE,OAAO;QAA6B,GAAG;YAAE,QAAQ;QAAI;IAClF,SAAU;QACR,MAAM,OAAO,WAAW;IAC1B;AACF","debugId":null}}]
+}
