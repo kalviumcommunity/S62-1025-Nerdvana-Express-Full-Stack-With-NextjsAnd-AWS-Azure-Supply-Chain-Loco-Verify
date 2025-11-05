@@ -1,30 +1,73 @@
-// Define PostgreSQL connection and Prisma client
+// prisma/schema.prisma
+
 datasource db {
   provider = "postgresql"
+  // Assumes DATABASE_URL is set in .env.local
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+  // Assuming 'client' is your app directory for future use, 
+  // though typically this is left as default in the root.
+  // For simplicity based on your structure:
+  // output   = "./client/node_modules/.prisma/client" 
 }
 
-// MODELS (Tables)
-model Vendor {
-  id           Int        @id @default(autoincrement())
-  name         String
-  email        String     @unique
-  phone        String
-  shopName     String
-  license      License?
-  createdAt    DateTime   @default(now())
+// --- ENUMS (Constraints/Status) ---
+enum Role {
+  VENDOR
+  ADMIN
+}
+
+enum LicenseStatus {
+  PENDING   
+  APPROVED  
+  REJECTED
+  EXPIRED
+}
+
+// --- CORE MODELS (Normalized Tables) ---
+
+model User {
+  // Primary Key (PK) - UUID is preferred for scalability (Deliverable)
+  id        String   @id @default(uuid()) 
+  
+  // Constraints: @unique enforces data integrity
+  email     String   @unique 
+  password  String   // Placeholder for Hashed password
+  
+  name      String?
+  phone     String?
+  shopName  String?
+  
+  // Check Constraint via Enum
+  role      Role     @default(VENDOR)
+  createdAt DateTime @default(now())
+
+  // Relation: One User can have Many Licenses (1:N)
+  licenses  License[] 
 }
 
 model License {
-  id           Int        @id @default(autoincrement())
-  licenseNo    String     @unique
-  issueDate    DateTime
-  expiryDate   DateTime
-  status       String
-  vendorId     Int        @unique
-  vendor       Vendor     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  id               String        @id @default(uuid())
+  licenseType      String
+  status           LicenseStatus @default(PENDING)
+  
+  // Dates
+  applicationDate  DateTime      @default(now())
+  issueDate        DateTime?
+  expiryDate       DateTime?
+  
+  // Foreign Key (FK) to User
+  vendorId         String
+  vendor           User          @relation(fields: [vendorId], references: [id])
+  
+  // Document links (NOT NULL enforced by application logic, though fields are optional here)
+  idProofLink      String        
+  shopPhotoLink    String        
+
+  // Indexes (Deliverable: faster lookups on frequently queried columns)
+  @@index([vendorId]) // For Vendor Dashboard
+  @@index([status]) // For Admin Dashboard
 }
