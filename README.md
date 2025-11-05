@@ -1,77 +1,74 @@
 # Loco Verify
 
 ## Problem Statement
-Railway vendors (like tea stalls or bookshops) still rely on paper-based licenses and renewals. How can digital verification simplify their onboarding and compliance?
+Railway vendors such as tea stalls and bookshops still depend on manual, paper-based processes for license applications and renewals. How can digitizing this workflow improve efficiency, transparency, and accessibility for both vendors and railway officers?
 
 ## Solution
-Loco Verify automates the entire vendor license lifecycle — from application submission to verification, approval, and renewal. Vendors can easily upload necessary documents online, and railway officers can digitally verify and manage licenses efficiently.
+Loco Verify streamlines the entire vendor license management process — from initial registration to verification, approval, and periodic renewal. Vendors can upload essential documents online, while officials can seamlessly review, verify, and manage approvals through a unified dashboard.
 
 ---
 
 ## Key Features
 
-- **Vendor Registration:** Vendors submit their ID proof, shop photo, and select license type through an intuitive form.
-- **Digital Verification:** Admin users can review submitted documents and approve or reject license applications.
-- **License Renewal:** Vendors can request license renewal before expiry, ensuring continuity.
-- **Email/SMS Notifications:** Optional stretch goal to notify vendors of approval status or renewal reminders.
+- **Vendor Onboarding:** Vendors can easily register by submitting their ID proofs, shop images, and selecting the relevant license category.
+- **Digital Review System:** Authorized officers can digitally inspect uploaded documents and approve or decline license requests.
+- **Renewal Requests:** Vendors can conveniently initiate renewal requests before license expiry, ensuring uninterrupted operations.
+- **Automated Notifications:** (Optional) Email or SMS alerts keep vendors informed about approval updates and upcoming renewal dates.
 
 ---
 
 ## Technology Stack
 
-- **Next.js** — Frontend UI and API routes for backend logic.
-- **PostgreSQL + Prisma** — For robust and scalable database management of vendor data.
-- **AWS S3** — Secure storage for uploaded documents such as ID proofs and shop photos.
-- **GitHub Actions** — Automated CI/CD pipeline for deployment.
+- **Next.js** — For building both the user interface and backend APIs within one framework.
+- **PostgreSQL + Prisma ORM** — Handles structured vendor data with efficient schema management.
+- **AWS S3** — Provides secure and scalable cloud storage for uploaded verification documents.
+- **GitHub Actions** — Powers continuous integration and deployment workflows for smooth updates.
 
 ---
 
 ## Folder Structure
 src/
-├── app/ # Routes and pages using Next.js App Router
-├── components/ # Reusable UI components like forms, buttons, cards
-├── lib/ # Utility functions, database connection, API helpers
-├── prisma/ # Prisma schema and migration files
-├── styles/ # Global and component-level CSS styles
+├── app/ # Page routes and layouts powered by Next.js App Router
+├── components/ # Modular UI elements such as forms, tables, and alerts
+├── lib/ # Helper functions, API utilities, and database connections
+├── prisma/ # Prisma schema definitions and migration records
+├── styles/ # Centralized and component-specific style sheets
+
 
 
 ---
 
 ## Setup Instructions
 
-1. Clone repo and enter directory:
-
+1. Clone the repository and move into the project directory:
    ```bash
    git clone https://github.com/yourusername/loco-verify.git
    cd loco-verify
+Install required dependencies:
 
-2. Install dependencies:
+npm install
 
-    npm install
-
-3. Create .env with:
+Create a .env file with the following values:
 
 DATABASE_URL=your_postgres_connection_string
 AWS_ACCESS_KEY_ID=your_aws_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret
 NEXT_PUBLIC_AWS_S3_BUCKET=your_s3_bucket_name
 
+Apply database migrations:
 
-4. Run migrations:
 
 npx prisma migrate dev
-
-
-Start dev server:
+Launch the development server:
 
 npm run dev
 
+Open the app in your browser at:
 
-Visit http://localhost:3000
+http://localhost:3000
 
-Reflection
-
-This structure keeps code modular and scalable, allowing team members to work independently on routes, components, and  logic. It supports future feature additions and smooth maintenance.
+## Reflection
+This setup ensures a clean separation of concerns, making collaboration between developers smoother and the project easy to scale. It encourages maintainability, allowing new features like analytics or vendor performance tracking to be integrated with minimal friction.
 
 ![Local app running](./screenshot.png)
 
