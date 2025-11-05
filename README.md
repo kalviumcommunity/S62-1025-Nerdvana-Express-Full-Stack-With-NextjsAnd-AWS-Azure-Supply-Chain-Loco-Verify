@@ -90,3 +90,14 @@ Configurations enforce semicolons, double quotes, and prevent console logs.
 
 Pre-Commit Hooks (Husky + lint-staged)
 Automatically runs lint and formatting checks before commits, ensuring all code entering the repo is clean and consistent.
+
+
+## Prisma Setup Summary
+
+- Installed Prisma ORM and generated initial setup with `npx prisma init`.
+- Configured the database connection using `DATABASE_URL` in `.env`.
+- Defined data models for Vendors, Licenses, and Admins in `schema.prisma`.
+- Ran `npx prisma migrate dev` to apply schema changes to the database.
+- Generated the Prisma client for use in the app’s API routes.
+
+Screenshot : ![alt text](image.png)
