@@ -58,7 +58,7 @@ function mitt() {
             }
         },
         emit (type, ...evts) {
-             
+            // eslint-disable-next-line array-callback-return
             ;
             (all[type] || []).slice().map((handler)=>{
                 handler(...evts);
@@ -3292,7 +3292,7 @@ function resolveDynamicRoute(pathname, pages) {
     }
     // handle resolving href for dynamic routes
     if (!pages.includes(cleanPathname)) {
-         
+        // eslint-disable-next-line array-callback-return
         pages.some((page)=>{
             if ((0, _isdynamic.isDynamicRoute)(page) && (0, _routeregex.getRouteRegex)(page).re.test(cleanPathname)) {
                 pathname = page;
@@ -3805,24 +3805,20 @@ class Router {
                     return new Promise(()=>{});
                 }
                 const routerFilterSValue = ("TURBOPACK compile-time value", {
-                    "numItems": ("TURBOPACK compile-time value", 3),
+                    "numItems": ("TURBOPACK compile-time value", 6),
                     "errorRate": ("TURBOPACK compile-time value", 0.0001),
-                    "numBits": ("TURBOPACK compile-time value", 58),
+                    "numBits": ("TURBOPACK compile-time value", 116),
                     "numHashes": ("TURBOPACK compile-time value", 14),
                     "bitArray": ("TURBOPACK compile-time value", [
                         ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
@@ -3833,23 +3829,19 @@ class Router {
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 0),
-                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
-                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
@@ -3860,18 +3852,84 @@ class Router {
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 0),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 1),
+                        ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 0),
                         ("TURBOPACK compile-time value", 1),
                         ("TURBOPACK compile-time value", 0)
                     ])
                 });
                 if (!staticFilterData && routerFilterSValue) {
-                    staticFilterData = ("TURBOPACK compile-time truthy", 1) ? routerFilterSValue : "TURBOPACK unreachable";
+                    staticFilterData = routerFilterSValue ? routerFilterSValue : undefined;
                 }
                 const routerFilterDValue = ("TURBOPACK compile-time value", {
                     "numItems": ("TURBOPACK compile-time value", 0),
@@ -5577,7 +5635,7 @@ const METATYPES = [
                 keys.add(key);
             }
         }
-         
+        // eslint-disable-next-line default-case
         switch(h.type){
             case 'title':
             case 'base':

@@ -19,8 +19,6 @@
   "dependencies": {
     "@prisma/client": "^6.18.0",
     "bcrypt": "^6.0.0"
-  },
-  "prisma": {
-  "seed": "tsx prisma/seed.ts"
-}
+  }
+
 }
