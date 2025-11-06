@@ -98,3 +98,111 @@ Automatically runs lint and formatting checks before commits, ensuring all code 
 - Generated the Prisma client for use in the app’s API routes.
 
 Screenshot : ![alt text](image.png)
+
+
+
+##  Authentication Module (Signup & Login)
+
+###  Flow Overview
+
+**Signup Flow**
+1. User sends `name`, `email`, and `password` to `/api/auth/signup`.
+2. The server checks if the email already exists in the database.
+3. If not, the password is securely **hashed using bcrypt**.
+4. Prisma inserts the new user into the `User` table.
+5. The server returns a success response with user details (excluding password).
+
+**Login Flow**
+1. User sends `email` and `password` to `/api/auth/login`.
+2. The server finds the user by email.
+3. The entered password is compared with the stored **hashed password** using bcrypt.
+4. If valid, a **JWT token** is generated and returned.
+5. The token is used to authenticate further API requests.
+
+---
+
+### 📬 Sample API Requests and Responses
+
+**Signup Request**
+
+POST /api/auth/signup
+{
+  "name": "Sera Shine",
+  "email": "sera@example.com",
+  "password": "mypassword123"
+}
+
+**Signup Success Response**
+{
+  "message": "User created successfully",
+  "user": {
+    "id": "cltxx12345",
+    "name": "Sera Shine",
+    "email": "sera@example.com",
+    "createdAt": "2025-11-06T12:00:00.000Z"
+  }
+}
+
+**Signup Failure Response**
+{
+  "error": "User already exists"
+}
+
+**Login Request**
+POST /api/auth/login
+{
+  "email": "sera@example.com",
+  "password": "mypassword123"
+}
+
+**Login Success Response**
+{
+  "message": "Login successful",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "cltxx12345",
+    "name": "Sera Shine",
+    "email": "sera@example.com"
+  }
+}
+
+**Login Failure Response**
+{
+  "error": "Invalid email or password"
+}
+
+### Password Hashing & JWT Explanation
+
+**Password Hashing:**
+Implemented using bcrypt. Before saving to the database, passwords are converted into irreversible hashed strings, ensuring credentials remain secure even if the database is exposed.
+
+**JWT Generation:**
+Upon successful login, a JWT (JSON Web Token) is created using a secret key.
+
+It contains the user’s ID and email.
+
+It allows stateless authentication for subsequent requests.
+
+### Token Expiry & Storage
+
+**Token Expiry:** Tokens are set to expire after 1 hour for security.
+
+**Storage Options:**
+
+HTTP-only cookies → safer, prevents XSS attacks.
+
+localStorage/sessionStorage → easier for front-end management but more vulnerable.
+
+**Refresh Strategy:**
+
+Implement a /api/auth/refresh endpoint that issues a new token when the old one expires.
+
+Store short-lived access tokens and long-lived refresh tokens separately.
+
+**Screenshots :**
+
+1. **Signup successful**:![alt text](image-7.png)
+2. **Signup error**:![alt text](image-8.png)
+3. **Login successful**:![alt text](image-3.png)
+4. **Login error**:![alt text](image-2.png)
+5. **Token Verification**:![alt text](image-9.png)
