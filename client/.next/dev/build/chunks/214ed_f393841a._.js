@@ -5943,7 +5943,7 @@ Result.default = Result;
 "[project]/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/node_modules/postcss/lib/warn-once.js [postcss] (ecmascript)", ((__turbopack_context__, module, exports) => {
 "use strict";
 
-  let printed = {};
+/* eslint-disable no-console */ let printed = {};
 module.exports = function warnOnce(message) {
     if (printed[message]) return;
     printed[message] = true;
@@ -6170,13 +6170,13 @@ class LazyResult {
                     let a = pluginVer.split('.');
                     let b = runtimeVer.split('.');
                     if (a[0] !== b[0] || parseInt(a[1]) > parseInt(b[1])) {
-                         
+                        // eslint-disable-next-line no-console
                         console.error('Unknown error from PostCSS plugin. Your current PostCSS ' + 'version is ' + runtimeVer + ', but ' + pluginName + ' uses ' + pluginVer + '. Perhaps this is the source of the error below.');
                     }
                 }
             }
         } catch (err) {
-            /* c8 ignore next 3 */  
+            /* c8 ignore next 3 */ // eslint-disable-next-line no-console
             if (console && console.error) console.error(err);
         }
         return error;
@@ -6639,13 +6639,13 @@ function postcss(...plugins) {
 postcss.plugin = function plugin(name, initializer) {
     let warningPrinted = false;
     function creator(...args) {
-         
+        // eslint-disable-next-line no-console
         if (console && console.warn && !warningPrinted) {
             warningPrinted = true;
-             
+            // eslint-disable-next-line no-console
             console.warn(name + ': postcss.plugin was deprecated. Migration guide:\n' + 'https://evilmartians.com/chronicles/postcss-8-plugin-migration');
             if (process.env.LANG && process.env.LANG.startsWith('cn')) {
-                /* c8 ignore next 7 */  
+                /* c8 ignore next 7 */ // eslint-disable-next-line no-console
                 console.warn(name + ': 里面 postcss.plugin 被弃用. 迁移指南:\n' + 'https://www.w3ctech.com/topic/2226');
             }
         }

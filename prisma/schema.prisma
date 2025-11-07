@@ -11,8 +11,8 @@ generator client {
 
 // --- ENUMS (Constraints/Status) ---
 enum Role {
-  VENDOR
-  ADMIN
+  Vendor
+  Official
 }
 
 enum LicenseStatus {
@@ -31,7 +31,7 @@ model User {
   name      String?
   phone     String?
   shopName  String?
-  role      Role     @default(VENDOR)
+  role      Role     @default(Vendor)
   createdAt DateTime @default(now())
   licenses  License[] 
 }

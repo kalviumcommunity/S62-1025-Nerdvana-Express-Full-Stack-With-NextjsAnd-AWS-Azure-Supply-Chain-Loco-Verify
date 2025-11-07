@@ -70,10 +70,11 @@ const prisma = new __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f
 async function POST(request) {
     try {
         const body = await request.json();
-        const { name, email, password } = body;
+        const { name, email, password, phone, shopName, role = __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__["Role"].Vendor // Default to Vendor if not provided
+         } = body;
         if (!name || !email || !password) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "All fields (name, email, password) are required"
+                error: "Name, email, and password are required"
             }, {
                 status: 400
             });
@@ -91,19 +92,33 @@ async function POST(request) {
                 status: 400
             });
         }
+        // Validate role
+        if (role && !Object.values(__TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__["Role"]).includes(role)) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "Invalid role. Must be either 'Vendor' or 'Official'"
+            }, {
+                status: 400
+            });
+        }
         // 🔐 Hash password
         const hashedPassword = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].hash(password, 10);
-        // 🧩 Create new user
+        // 🧩 Create new user with all fields
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                phone: phone || null,
+                shopName: shopName || null,
+                role: role
             },
             select: {
                 id: true,
                 name: true,
                 email: true,
+                phone: true,
+                shopName: true,
+                role: true,
                 createdAt: true
             }
         });

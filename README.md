@@ -206,3 +206,14 @@ Store short-lived access tokens and long-lived refresh tokens separately.
 3. **Login successful**:![alt text](image-3.png)
 4. **Login error**:![alt text](image-2.png)
 5. **Token Verification**:![alt text](image-9.png)
+
+##  Concept 2.21 — Authorization Middleware
+
+Implemented a reusable middleware in Next.js to enforce **Role-Based Access Control (RBAC)** using JWT verification.  
+- Protected routes based on roles: `Official` (admin) and `Vendor` (user).  
+- Added middleware to validate tokens and restrict unauthorized access.  
+- Tested access for both roles using `/api/admin` and `/api/users` routes.  
+
+**Screenshots**:
+1.Successful Official access: ![alt text](image-4.png)
+2.Officials access denied for vendor:![alt text](image-5.png)

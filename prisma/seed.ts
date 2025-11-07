@@ -12,25 +12,26 @@ const getExpiryDate = (days: number): Date => {
 async function main() {
   console.log('Start seeding...');
 
+  // Clean up existing records
   await prisma.license.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.User.deleteMany();
   console.log('Cleaned up existing User and License records.');
   
-  // --- Create Admin User ---
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@locoverify.com' },
+  // --- Create Official User (admin-like) ---
+  const officialUser = await prisma.User.upsert({
+    where: { email: 'official@locoverify.com' },
     update: {},
     create: {
-      email: 'admin@locoverify.com',
-      password: 'hashed_admin_password_123',
-      name: 'System Administrator',
-      role: Role.ADMIN,
+      email: 'official@locoverify.com',
+      password: 'hashed_official_password_123',
+      name: 'System Official',
+      role: Role.Official, // Updated role
     },
   });
-  console.log(`Created Admin User: ${adminUser.email}`);
+  console.log(`Created Official User: ${officialUser.email}`);
 
   // --- Create Vendor Users and Licenses ---
-  const vendor1 = await prisma.user.upsert({
+  const vendor1 = await prisma.User.upsert({
     where: { email: 'vendor1@shop.com' },
     update: {},
     create: {
@@ -39,7 +40,7 @@ async function main() {
       name: 'Jane Doe',
       shopName: 'Jane\'s Fresh Produce',
       phone: '555-0101',
-      role: Role.VENDOR,
+      role: Role.Vendor, // Updated role
       licenses: {
         create: {
           licenseType: 'Food Vendor Permit',
@@ -53,8 +54,8 @@ async function main() {
     },
   });
   console.log(`Created Vendor 1 (Approved): ${vendor1.email}`);
-  
-  // ... rest of your seed code
+
+  // You can add more vendors here...
 }
 
 main()
