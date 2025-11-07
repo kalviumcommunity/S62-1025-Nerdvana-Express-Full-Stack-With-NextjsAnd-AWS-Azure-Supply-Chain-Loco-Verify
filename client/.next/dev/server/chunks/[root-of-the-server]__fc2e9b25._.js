@@ -113,34 +113,40 @@ async function POST(request) {
         });
         if (!user) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "User not found"
+                error: "Invalid email or password"
             }, {
-                status: 404
+                status: 401
             });
         }
         // 🔐 Compare password
         const isPasswordValid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$29$__["default"].compare(password, user.password);
         if (!isPasswordValid) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "Invalid credentials"
+                error: "Invalid email or password"
             }, {
                 status: 401
             });
         }
-        // 🎟️ Generate JWT token
+        // 🎟️ Generate JWT token with user role
         const token = __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].sign({
             id: user.id,
-            email: user.email
+            email: user.email,
+            role: user.role
         }, JWT_SECRET, {
-            expiresIn: "1h"
-        });
-        // 🧩 Return user info and token
+            expiresIn: "24h"
+        } // Extended to 24h for better UX
+        );
+        // 🧩 Return complete user info and token
         return __TURBOPACK__imported__module__$5b$project$5d2f$Desktop$2f$S62$2d$1025$2d$Nerdvana$2d$Express$2d$Full$2d$Stack$2d$With$2d$NextjsAnd$2d$AWS$2d$Azure$2d$Supply$2d$Chain$2d$Loco$2d$Verify$2f$client$2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             message: "Login successful",
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phone: user.phone,
+                shopName: user.shopName,
+                role: user.role,
+                createdAt: user.createdAt
             },
             token
         }, {

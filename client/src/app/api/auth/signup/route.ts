@@ -1,17 +1,24 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password } = body;
+    const { 
+      name, 
+      email, 
+      password, 
+      phone, 
+      shopName, 
+      role = Role.Vendor // Default to Vendor if not provided
+    } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "All fields (name, email, password) are required" },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
@@ -28,20 +35,34 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate role
+    if (role && !Object.values(Role).includes(role)) {
+      return NextResponse.json(
+        { error: "Invalid role. Must be either 'Vendor' or 'Official'" },
+        { status: 400 }
+      );
+    }
+
     // 🔐 Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🧩 Create new user
+    // 🧩 Create new user with all fields
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        phone: phone || null,
+        shopName: shopName || null,
+        role: role,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        phone: true,
+        shopName: true,
+        role: true,
         createdAt: true,
       },
     });

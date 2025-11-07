@@ -1,0 +1,22 @@
+{
+  "devFiles": [],
+  "ampDevFiles": [],
+  "polyfillFiles": [
+    "static/chunks/214ed_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0b55ae3f._.js",
+    "static/chunks/214ed_next_dist_compiled_react-dom_f3bb7af3._.js",
+    "static/chunks/214ed_next_dist_compiled_react-server-dom-turbopack_54c46bf4._.js",
+    "static/chunks/214ed_next_dist_compiled_next-devtools_index_1a983a6a.js",
+    "static/chunks/214ed_next_dist_compiled_b598292d._.js",
+    "static/chunks/214ed_next_dist_client_d81b0b98._.js",
+    "static/chunks/214ed_next_dist_b276fa1d._.js",
+    "static/chunks/214ed_@swc_helpers_cjs_3bc61169._.js",
+    "static/chunks/49193_ess-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify_client_a0ff3932._.js",
+    "static/chunks/f3f82_ess-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify_client_ce736122._.js"
+  ],
+  "pages": {},
+  "ampFirstPages": []
+}
