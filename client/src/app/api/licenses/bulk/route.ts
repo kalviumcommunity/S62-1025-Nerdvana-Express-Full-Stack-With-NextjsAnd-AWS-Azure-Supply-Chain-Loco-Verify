@@ -31,10 +31,10 @@ export async function POST(req: Request) {
       { success: true, count: result.count },
       { status: 201 }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown server error";
+
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { PrismaClient, LicenseStatus, Role } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
@@ -13,8 +13,9 @@ export async function POST(req: Request) {
       if (!vendor) throw new Error("Vendor not found");
 
       // ✅ business rule: Only vendors can apply
-      if (vendor.role !== Role.VENDOR)
+      if (vendor.role !== Role.VENDOR) {
         throw new Error("Only Vendors can apply");
+      }
 
       // ✅ Step 2 — create license
       const license = await tx.license.create({
@@ -36,10 +37,9 @@ export async function POST(req: Request) {
       { success: true, license: result },
       { status: 201 }
     );
-  } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: err.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown server error";
+
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
