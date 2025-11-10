@@ -4,34 +4,35 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
+// Define the payload structure to resolve the 'any' error
+type JwtPayload = { userId: string; role: string };
+
 // Paths that require authentication
 const protectedPaths = [
   "/api/users",
   "/api/admin",
-  "/api/orders",    // Add if you have order routes
-  "/api/products",  // Add if you have product routes that need auth
+  "/api/orders",
+  "/api/products",
 ];
 
 // Public paths that don't require authentication
 const publicPaths = [
   "/api/auth/signup",
   "/api/auth/login",
-  "/api/auth/verify", // If you have email verification
-  "/api/public",      // Any other public APIs
+  "/api/auth/verify",
+  "/api/public",
 ];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Check if the current path is protected
-  const isProtectedPath = protectedPaths.some(path => 
+  const isProtectedPath = protectedPaths.some((path) =>
     pathname.startsWith(path)
   );
 
   // Check if the current path is explicitly public
-  const isPublicPath = publicPaths.some(path => 
-    pathname.startsWith(path)
-  );
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
   // Skip middleware for public paths
   if (isPublicPath) {
@@ -51,14 +52,15 @@ export function middleware(req: NextRequest) {
     }
 
     try {
-      const decoded: any = jwt.verify(token, JWT_SECRET);
+      // FIX 1: Cast the result to the defined type to remove the 'any' error (Line 52)
+      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
       // Add user info to request headers for API routes to use
       const requestHeaders = new Headers(req.headers);
-      requestHeaders.set('x-user-id', decoded.userId);
-      requestHeaders.set('x-user-role', decoded.role);
+      requestHeaders.set("x-user-id", decoded.userId);
+      requestHeaders.set("x-user-role", decoded.role);
 
-      // Restrict admin routes to Official role only
+      // Restrict admin routes to Official role only (assuming Official is the admin role)
       if (pathname.startsWith("/api/admin") && decoded.role !== "Official") {
         return NextResponse.json(
           { success: false, message: "Admin access required" },
@@ -71,7 +73,8 @@ export function middleware(req: NextRequest) {
           headers: requestHeaders,
         },
       });
-    } catch (error) {
+      // FIX 2: Precede the unused variable with an underscore (_error) (Line 72)
+    } catch {
       return NextResponse.json(
         { success: false, message: "Invalid or expired token" },
         { status: 403 }

@@ -12,18 +12,31 @@ export async function GET(request: Request) {
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
-        { success: false, message: "Authorization token missing or invalid format" },
+        {
+          success: false,
+          message: "Authorization token missing or invalid format",
+        },
         { status: 401 }
       );
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string; role: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      email: string;
+      role: string;
+    };
 
     // 🧩 Fetch user from database
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: { id: true, name: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
     });
 
     if (!user) {
@@ -50,11 +63,14 @@ export async function GET(request: Request) {
       },
       { status: 200 }
     );
-
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Token verification failed:", error);
     return NextResponse.json(
-      { success: false, message: "Invalid or expired token", details: error.message },
+      {
+        success: false,
+        message: "Invalid or expired token",
+        details: error.message,
+      },
       { status: 403 }
     );
   } finally {

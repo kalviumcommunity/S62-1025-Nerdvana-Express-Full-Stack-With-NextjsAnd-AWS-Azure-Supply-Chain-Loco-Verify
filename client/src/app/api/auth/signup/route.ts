@@ -7,13 +7,13 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { 
-      name, 
-      email, 
-      password, 
-      phone, 
-      shopName, 
-      role = Role.Vendor // Default to Vendor if not provided
+    const {
+      name,
+      email,
+      password,
+      phone,
+      shopName,
+      role = Role.Vendor, // Default to Vendor if not provided
     } = body;
 
     if (!name || !email || !password) {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       { message: "User created successfully", user: newUser },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { error: "Internal Server Error", details: error.message },

@@ -1,0 +1,3 @@
+{
+  "/api/licenses/bulk/route": "app/api/licenses/bulk/route.js"
+}

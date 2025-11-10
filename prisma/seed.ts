@@ -13,35 +13,33 @@ async function main() {
 
   // Clean up existing records
   await prisma.license.deleteMany();
-  await prisma.user.deleteMany(); 
+  await prisma.user.deleteMany();
   console.log('Cleaned up existing User and License records.');
   
   // --- Create Official User (admin-like) ---
-  const officialUser = await prisma.user.upsert({ 
+  const officialUser = await prisma.user.upsert({
     where: { email: 'official@locoverify.com' },
     update: {},
     create: {
       email: 'official@locoverify.com',
       password: 'hashed_official_password_123',
       name: 'System Official',
-      // CORRECT: Matches your schema's enum member exactly
-      role: Role.Official, 
+      role: Role.ADMIN,          // ✅ FIXED
     },
   });
   console.log(`Created Official User: ${officialUser.email}`);
 
   // --- Create Vendor Users and Licenses ---
-  const vendor1 = await prisma.user.upsert({ 
+  const vendor1 = await prisma.user.upsert({
     where: { email: 'vendor1@shop.com' },
     update: {},
     create: {
       email: 'vendor1@shop.com',
       password: 'hashed_vendor_password_123',
       name: 'Jane Doe',
-      shopName: 'Jane\'s Fresh Produce',
+      shopName: "Jane's Fresh Produce",
       phone: '555-0101',
-      // CORRECT: Matches your schema's enum member exactly
-      role: Role.Vendor, 
+      role: Role.VENDOR,        // ✅ FIXED
       licenses: {
         create: {
           licenseType: 'Food Vendor Permit',
