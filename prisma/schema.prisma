@@ -1,18 +1,16 @@
-// prisma/schema.prisma
-
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// --- ENUMS (Constraints/Status) ---
+// --- ENUMS ---
 enum Role {
-  Vendor
-  Official
+  VENDOR
+  ADMIN
 }
 
 enum LicenseStatus {
@@ -22,18 +20,17 @@ enum LicenseStatus {
   EXPIRED
 }
 
-// --- CORE MODELS (Normalized Tables) ---
-
+// --- MODELS ---
 model User {
-  id        String   @id @default(uuid()) 
-  email     String   @unique 
+  id        String    @id @default(uuid()) 
+  email     String    @unique 
   password  String
   name      String?
   phone     String?
   shopName  String?
-  role      Role     @default(Vendor)
-  createdAt DateTime @default(now())
-  licenses  License[] 
+  role      Role      @default(VENDOR)
+  createdAt DateTime  @default(now())
+  licenses  License[]
 }
 
 model License {
@@ -50,4 +47,6 @@ model License {
 
   @@index([vendorId])
   @@index([status])
+  @@index([licenseType])
+  @@index([applicationDate])
 }

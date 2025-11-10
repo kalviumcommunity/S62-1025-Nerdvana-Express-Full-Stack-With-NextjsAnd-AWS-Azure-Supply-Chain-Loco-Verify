@@ -41,10 +41,10 @@ export async function POST(request: Request) {
 
     // 🎟️ Generate JWT token with user role
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role 
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
       },
       JWT_SECRET,
       { expiresIn: "24h" } // Extended to 24h for better UX
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Login error:", error);
     return NextResponse.json(
       { error: "Internal Server Error", details: error.message },

@@ -15,7 +15,11 @@ export async function GET(request: Request) {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string; role: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      email: string;
+      role: string;
+    };
 
     // ✅ Restrict to Official users only
     if (decoded.role !== "Official") {
@@ -29,10 +33,14 @@ export async function GET(request: Request) {
       { success: true, message: "Welcome Official! You have full access." },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin route error:", error);
     return NextResponse.json(
-      { success: false, message: "Invalid or expired token", details: error.message },
+      {
+        success: false,
+        message: "Invalid or expired token",
+        details: error.message,
+      },
       { status: 403 }
     );
   }
