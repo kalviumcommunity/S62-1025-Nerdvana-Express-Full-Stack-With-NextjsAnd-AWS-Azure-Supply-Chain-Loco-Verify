@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient,Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
     // 🧩 Fetch user from database
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: decoded.id.toString()},
       select: {
         id: true,
         name: true,
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     }
 
     // 🧠 Role-based access example
-    if (user.role !== "Vendor" && user.role !== "Official") {
+    if (user.role !== Role.VENDOR && user.role !==Role.ADMIN) {
       return NextResponse.json(
         { success: false, message: "Access denied. Invalid role." },
         { status: 403 }
@@ -58,18 +58,18 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: `Access granted. Hello ${user.role === "Official" ? "Official" : "Vendor"}!`,
+        message: `Access granted. Hello ${user.role === "ADMIN" ? "ADMIN" : "VENDOR"}!`,
         user,
       },
       { status: 200 }
     );
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Token verification failed:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Invalid or expired token",
-        details: error.message,
+        // details: error.message,
       },
       { status: 403 }
     );

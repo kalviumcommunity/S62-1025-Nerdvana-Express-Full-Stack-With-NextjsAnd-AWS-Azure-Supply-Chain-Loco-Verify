@@ -33,13 +33,13 @@ export async function GET(request: Request) {
       { success: true, message: "Welcome Official! You have full access." },
       { status: 200 }
     );
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Admin route error:", error);
     return NextResponse.json(
       {
         success: false,
         message: "Invalid or expired token",
-        details: error.message,
+        // details: error.message,
       },
       { status: 403 }
     );

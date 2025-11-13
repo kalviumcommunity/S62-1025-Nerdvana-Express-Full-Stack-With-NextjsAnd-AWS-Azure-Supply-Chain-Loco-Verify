@@ -217,3 +217,23 @@ Implemented a reusable middleware in Next.js to enforce **Role-Based Access Cont
 **Screenshots**:
 1.Successful Official access: ![alt text](image-4.png)
 2.Officials access denied for vendor:![alt text](image-5.png)
+
+\
+## Concept 2.12 — Docker & Compose Setup for Local Development
+
+In this unit, I set up **Docker** and **Docker Compose** to run the full-stack application in containers.  
+I created a **Dockerfile** for the Next.js client and a **docker-compose.yml** file to connect the app with **PostgreSQL** and **Redis**.  
+This setup ensures that all services run together smoothly in a local environment, similar to production.
+
+### Highlights
+- Built a Dockerfile using **Node.js 20-slim** for the Next.js client.  
+- Configured **docker-compose.yml** to include services for the app, database, and Redis cache.  
+- Used environment variables, shared networks, and volumes for seamless integration.  
+
+### Reflection
+This configuration makes development easier and more consistent across systems.  
+It helps eliminate environment issues and allows the entire project to run with one command:
+
+docker-compose up --build
+
+**Screnshot**: ![alt text](image-6.png)

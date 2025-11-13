@@ -1,4 +1,4 @@
-import { PrismaClient, LicenseStatus, Role } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
