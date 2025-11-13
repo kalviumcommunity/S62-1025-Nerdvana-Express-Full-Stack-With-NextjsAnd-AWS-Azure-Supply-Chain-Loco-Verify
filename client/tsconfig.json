@@ -25,7 +25,12 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@prisma/client": ["./node_modules/.prisma/client"]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -33,7 +38,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "node_modules/.prisma/client/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

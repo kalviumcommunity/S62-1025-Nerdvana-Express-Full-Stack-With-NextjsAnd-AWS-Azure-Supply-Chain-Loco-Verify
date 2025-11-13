@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       password,
       phone,
       shopName,
-      role = Role.Vendor, // Default to Vendor if not provided
+      role = Role.VENDOR, // This should work now!
     } = body;
 
     if (!name || !email || !password) {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 🔍 Check if user already exists
+    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -35,18 +35,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate role
+    // Validate role - use Object.values() instead of direct enum values
     if (role && !Object.values(Role).includes(role)) {
       return NextResponse.json(
-        { error: "Invalid role. Must be either 'Vendor' or 'Official'" },
+        { error: "Invalid role. Must be either 'VENDOR' or 'ADMIN'" },
         { status: 400 }
       );
     }
 
-    // 🔐 Hash password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🧩 Create new user with all fields
+    // Create new user
     const newUser = await prisma.user.create({
       data: {
         name,
@@ -71,10 +71,10 @@ export async function POST(request: Request) {
       { message: "User created successfully", user: newUser },
       { status: 201 }
     );
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   } finally {

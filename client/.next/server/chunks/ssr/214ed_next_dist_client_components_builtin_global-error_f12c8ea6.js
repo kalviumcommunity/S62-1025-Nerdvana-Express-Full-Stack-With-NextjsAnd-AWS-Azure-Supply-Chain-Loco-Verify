@@ -1,0 +1,3 @@
+module.exports=[52852,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(84002);a.n(d("[project]/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},37285,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(84002);a.n(d("[project]/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/node_modules/next/dist/client/components/builtin/global-error.js"))},90255,a=>{"use strict";a.i(52852);var b=a.i(37285);a.n(b)}];
+
+//# sourceMappingURL=214ed_next_dist_client_components_builtin_global-error_f12c8ea6.js.map
