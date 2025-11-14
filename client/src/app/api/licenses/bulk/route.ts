@@ -1,5 +1,6 @@
 import { PrismaClient, LicenseStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
 
@@ -31,10 +32,7 @@ export async function POST(req: Request) {
       { success: true, count: result.count },
       { status: 201 }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return handleError(error, "POST /api/licenses/bulk"); // REPLACE ERROR HANDLING
   }
 }

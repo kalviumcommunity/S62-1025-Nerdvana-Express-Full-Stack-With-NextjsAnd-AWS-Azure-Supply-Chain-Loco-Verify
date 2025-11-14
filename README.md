@@ -237,3 +237,14 @@ It helps eliminate environment issues and allows the entire project to run with 
 docker-compose up --build
 
 **Screnshot**: ![alt text](image-6.png)
+
+## Error Handling Middleware
+
+This project implements a centralized error handling system that ensures consistent error responses and secure logging across all API routes.
+
+### Features
+
+- **Structured Error Responses**: All errors follow a consistent JSON format
+- **Environment-aware**: Detailed errors in development, user-friendly messages in production
+- **Structured Logging**: JSON-formatted logs for easy monitoring and debugging
+- **Security**: Stack traces hidden in production, sensitive data redacted

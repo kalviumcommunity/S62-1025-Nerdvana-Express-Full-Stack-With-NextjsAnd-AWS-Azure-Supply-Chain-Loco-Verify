@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -12,10 +13,9 @@ export async function POST(request: Request) {
     const { email, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Both email and password are required" },
-        { status: 400 }
-      );
+      const error = new Error("Both email and password are required");
+      error.name = "ValidationError";
+      throw error;
     }
 
     // 🔍 Check if user exists
@@ -24,19 +24,17 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Invalid email or password" }, // Generic message for security
-        { status: 401 }
-      );
+      const error = new Error("Invalid email or password");
+      error.name = "UnauthorizedError";
+      throw error;
     }
 
     // 🔐 Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: "Invalid email or password" }, // Generic message for security
-        { status: 401 }
-      );
+      const error = new Error("Invalid email or password");
+      error.name = "UnauthorizedError";
+      throw error;
     }
 
     // 🎟️ Generate JWT token with user role
@@ -68,11 +66,7 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Login error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error"},
-      { status: 500 }
-    );
+    return handleError(error, "POST /api/auth/login"); // REPLACE ERROR HANDLING
   } finally {
     await prisma.$disconnect();
   }
