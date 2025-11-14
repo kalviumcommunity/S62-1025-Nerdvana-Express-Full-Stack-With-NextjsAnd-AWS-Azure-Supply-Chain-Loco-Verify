@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { PrismaClient, Role } from "@prisma/client";
+import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
 
@@ -17,10 +18,9 @@ export async function POST(request: Request) {
     } = body;
 
     if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Name, email, and password are required" },
-        { status: 400 }
-      );
+      const error = new Error("Name, email, and password are required");
+      error.name = "ValidationError";
+      throw error;
     }
 
     // Check if user already exists
@@ -29,18 +29,18 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "User already exists" },
-        { status: 400 }
-      );
+      const error = new Error("User already exists");
+      error.name = "ValidationError";
+      throw error;
     }
 
     // Validate role - use Object.values() instead of direct enum values
     if (role && !Object.values(Role).includes(role)) {
-      return NextResponse.json(
-        { error: "Invalid role. Must be either 'VENDOR' or 'ADMIN'" },
-        { status: 400 }
+      const error = new Error(
+        "Invalid role. Must be either 'VENDOR' or 'ADMIN'"
       );
+      error.name = "ValidationError";
+      throw error;
     }
 
     // Hash password
@@ -72,11 +72,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Signup error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return handleError(error, "POST /api/auth/signup"); // REPLACE ERROR HANDLING
   } finally {
     await prisma.$disconnect();
   }

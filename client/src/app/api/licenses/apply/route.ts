@@ -1,5 +1,6 @@
 import { PrismaClient, Role } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
 
@@ -10,11 +11,18 @@ export async function POST(req: Request) {
     const result = await prisma.$transaction(async (tx) => {
       // ✅ Step 1 — ensure vendor exists
       const vendor = await tx.user.findUnique({ where: { id: vendorId } });
-      if (!vendor) throw new Error("Vendor not found");
+      if (!vendor) {
+        const error = new Error("Vendor not found");
+        error.name = "NotFoundError";
+        throw error;
+      }
 
       // ✅ business rule: Only vendors can apply
-      if (vendor.role !== Role.VENDOR)
-        throw new Error("Only Vendors can apply");
+      if (vendor.role !== Role.VENDOR) {
+        const error = new Error("Only Vendors can apply");
+        error.name = "ValidationError";
+        throw error;
+      }
 
       // ✅ Step 2 — create license
       const license = await tx.license.create({
@@ -26,7 +34,9 @@ export async function POST(req: Request) {
 
       // ❌ Force rollback example
       if (licenseType === "INVALID") {
-        throw new Error("Forced rollback test");
+        const error = new Error("Forced rollback test");
+        error.name = "ValidationError";
+        throw error;
       }
 
       return license;
@@ -36,10 +46,7 @@ export async function POST(req: Request) {
       { success: true, license: result },
       { status: 201 }
     );
-  } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: err.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error, "POST /api/licenses/apply"); // REPLACE ERROR HANDLING
   }
 }

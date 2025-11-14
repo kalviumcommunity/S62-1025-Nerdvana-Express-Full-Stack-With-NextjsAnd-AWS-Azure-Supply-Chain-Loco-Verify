@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { handleError } from "../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
 
@@ -8,11 +9,7 @@ export async function GET() {
     await prisma.$connect();
     return NextResponse.json({ message: "✅ Prisma connection successful!" });
   } catch (error) {
-    console.error("❌ Prisma connection error:", error);
-    return NextResponse.json(
-      { error: "Database connection failed" },
-      { status: 500 }
-    );
+    return handleError(error, "GET /api/test"); // REPLACE ERROR HANDLING
   } finally {
     await prisma.$disconnect();
   }

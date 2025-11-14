@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { handleError } from "../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
@@ -8,25 +9,31 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { success: false, message: "Authorization token missing" },
-        { status: 401 }
-      );
+      const error = new Error("Authorization token missing");
+      error.name = "UnauthorizedError";
+      throw error;
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      id: number;
-      email: string;
-      role: string;
-    };
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as {
+        id: number;
+        email: string;
+        role: string;
+      };
+    } catch  {
+      const error = new Error("Invalid or expired token");
+      error.name = "UnauthorizedError";
+      throw error;
+    }
 
     // ✅ Restrict to Official users only
     if (decoded.role !== "Official") {
-      return NextResponse.json(
-        { success: false, message: "Access denied. Officials only." },
-        { status: 403 }
-      );
+      const error = new Error("Access denied. Officials only.");
+      error.name = "UnauthorizedError";
+      throw error;
     }
 
     return NextResponse.json(
@@ -34,14 +41,6 @@ export async function GET(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Admin route error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Invalid or expired token",
-        // details: error.message,
-      },
-      { status: 403 }
-    );
+    return handleError(error, "GET /api/admin"); // REPLACE ERROR HANDLING
   }
 }

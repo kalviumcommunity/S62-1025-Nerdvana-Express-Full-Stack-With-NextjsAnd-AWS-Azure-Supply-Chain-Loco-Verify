@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { PrismaClient,Role } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
+import { handleError } from "../../../lib/errorHandler"; // Add this import
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
@@ -11,25 +12,30 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Authorization token missing or invalid format",
-        },
-        { status: 401 }
-      );
+      // Convert this to use error throwing for consistent handling
+      const error = new Error("Authorization token missing or invalid format");
+      error.name = "ValidationError";
+      throw error;
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      id: number;
-      email: string;
-      role: string;
-    };
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET) as {
+        id: number;
+        email: string;
+        role: string;
+      };
+    } catch {
+      const error = new Error("Invalid or expired token");
+      error.name = "UnauthorizedError";
+      throw error;
+    }
 
     // 🧩 Fetch user from database
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id.toString()},
+      where: { id: decoded.id.toString() },
       select: {
         id: true,
         name: true,
@@ -40,18 +46,16 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
-      );
+      const error = new Error("User not found");
+      error.name = "NotFoundError";
+      throw error;
     }
 
     // 🧠 Role-based access example
-    if (user.role !== Role.VENDOR && user.role !==Role.ADMIN) {
-      return NextResponse.json(
-        { success: false, message: "Access denied. Invalid role." },
-        { status: 403 }
-      );
+    if (user.role !== Role.VENDOR && user.role !== Role.ADMIN) {
+      const error = new Error("Access denied. Invalid role.");
+      error.name = "UnauthorizedError";
+      throw error;
     }
 
     // ✅ Success — send user info
@@ -64,15 +68,8 @@ export async function GET(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Token verification failed:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Invalid or expired token",
-        // details: error.message,
-      },
-      { status: 403 }
-    );
+    // Use the centralized error handler instead of manual error responses
+    return handleError(error, "GET /api/users");
   } finally {
     await prisma.$disconnect();
   }
