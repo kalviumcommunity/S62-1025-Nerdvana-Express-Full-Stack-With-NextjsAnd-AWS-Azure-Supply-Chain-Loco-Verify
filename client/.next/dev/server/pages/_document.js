@@ -1,5 +1,5 @@
 var R=require("../chunks/ssr/[turbopack]_runtime.js")("server/pages/_document.js")
-R.c("server/chunks/ssr/214ed_1dbf3653._.js")
+R.c("server/chunks/ssr/1e749_b78b6f75._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__e6a4d965._.js")
-R.m("[project]/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/node_modules/next/document.js [ssr] (ecmascript)")
-module.exports=R.m("[project]/Desktop/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/node_modules/next/document.js [ssr] (ecmascript)").exports
+R.m("[project]/client/node_modules/next/document.js [ssr] (ecmascript)")
+module.exports=R.m("[project]/client/node_modules/next/document.js [ssr] (ecmascript)").exports
