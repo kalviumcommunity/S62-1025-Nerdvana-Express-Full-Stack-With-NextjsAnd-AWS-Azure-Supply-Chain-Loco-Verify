@@ -1,5 +1,5 @@
 {
-  "/api/admin/route": "app/api/admin/route.js",
-  "/api/auth/signup/route": "app/api/auth/signup/route.js",
-  "/api/test/route": "app/api/test/route.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/isr/renewals/page": "app/isr/renewals/page.js",
+  "/static/vendors/page": "app/static/vendors/page.js"
 }

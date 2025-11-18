@@ -47,10 +47,37 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
+// Validate ../../../src/app/dynamic/licenses/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/dynamic/licenses">> = Specific
+  const handler = {} as typeof import("../../../src/app/dynamic/licenses/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../src/app/isr/renewals/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/isr/renewals">> = Specific
+  const handler = {} as typeof import("../../../src/app/isr/renewals/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../src/app/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/">> = Specific
   const handler = {} as typeof import("../../../src/app/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../src/app/static/vendors/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/static/vendors">> = Specific
+  const handler = {} as typeof import("../../../src/app/static/vendors/page.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
