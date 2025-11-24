@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { handleError } from '@/lib/errorHandler';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { handleError } from "@/lib/errorHandler";
 // import { authMiddleware } from '@/lib/authMiddleware';
 
 const prisma = new PrismaClient();
@@ -14,13 +14,13 @@ export async function GET(request: NextRequest) {
 
     // Get pagination parameters
     const { searchParams } = new URL(request.url);
-    const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 10;
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
     const skip = (page - 1) * limit;
 
     // Fetch vendors with pagination
     const vendors = await prisma.user.findMany({
-      where: { role: 'VENDOR' },
+      where: { role: "VENDOR" },
       skip,
       take: limit,
       select: {
@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
         role: true,
         createdAt: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     // Get total count for pagination info
     const total = await prisma.user.count({
-      where: { role: 'VENDOR' }
+      where: { role: "VENDOR" },
     });
 
     return NextResponse.json({
@@ -46,12 +46,11 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
-
   } catch (error) {
-    return handleError(error, 'GET /api/vendors');
+    return handleError(error, "GET /api/vendors");
   }
 }
 
@@ -59,23 +58,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Basic validation
     if (!body.name || !body.email || !body.password) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
     // Check if vendor already exists
     const existingVendor = await prisma.user.findUnique({
-      where: { email: body.email }
+      where: { email: body.email },
     });
 
     if (existingVendor) {
       return NextResponse.json(
-        { error: 'Vendor with this email already exists' },
+        { error: "Vendor with this email already exists" },
         { status: 409 }
       );
     }
@@ -88,7 +87,7 @@ export async function POST(request: NextRequest) {
         password: body.password, // Note: You should hash this password
         phone: body.phone,
         shopName: body.shopName,
-        role: 'VENDOR'
+        role: "VENDOR",
       },
       select: {
         id: true,
@@ -98,18 +97,17 @@ export async function POST(request: NextRequest) {
         shopName: true,
         role: true,
         createdAt: true,
-      }
+      },
     });
 
     return NextResponse.json(
-      { 
-        message: 'Vendor created successfully',
-        data: vendor 
+      {
+        message: "Vendor created successfully",
+        data: vendor,
       },
       { status: 201 }
     );
-
   } catch (error) {
-    return handleError(error, 'POST /api/vendors');
+    return handleError(error, "POST /api/vendors");
   }
 }

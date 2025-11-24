@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { errorHandler } from '@/lib/errorHandler';
-import { authMiddleware } from '@/lib/authMiddleware';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { errorHandler } from "@/lib/errorHandler";
+import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
@@ -26,32 +26,31 @@ export async function POST(
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     if (!existingLicense) {
-      return NextResponse.json(
-        { error: 'License not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "License not found" }, { status: 404 });
     }
 
     // Check if license is eligible for renewal (must be APPROVED or EXPIRED)
-    if (!['APPROVED', 'EXPIRED'].includes(existingLicense.status)) {
+    if (!["APPROVED", "EXPIRED"].includes(existingLicense.status)) {
       return NextResponse.json(
-        { 
-          error: 'License cannot be renewed. Only APPROVED or EXPIRED licenses can be renewed.',
-          currentStatus: existingLicense.status
+        {
+          error:
+            "License cannot be renewed. Only APPROVED or EXPIRED licenses can be renewed.",
+          currentStatus: existingLicense.status,
         },
         { status: 400 }
       );
     }
 
     // Calculate new expiration date
-    const renewalPeriod = body.renewalPeriod || existingLicense.validityPeriod || 12;
+    const renewalPeriod =
+      body.renewalPeriod || existingLicense.validityPeriod || 12;
     const currentExpiry = existingLicense.expiresAt || new Date();
     const newExpiry = new Date(currentExpiry);
     newExpiry.setMonth(newExpiry.getMonth() + renewalPeriod);
@@ -60,7 +59,7 @@ export async function POST(
     const renewedLicense = await prisma.license.update({
       where: { id: licenseId },
       data: {
-        status: 'PENDING_RENEWAL', // Or keep as APPROVED if auto-renew
+        status: "PENDING_RENEWAL", // Or keep as APPROVED if auto-renew
         expiresAt: newExpiry,
         validityPeriod: renewalPeriod,
         renewedAt: new Date(),
@@ -70,25 +69,24 @@ export async function POST(
         vendor: {
           select: {
             name: true,
-            businessName: true
-          }
-        }
-      }
+            businessName: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(
-      { 
-        message: 'License renewal submitted successfully',
+      {
+        message: "License renewal submitted successfully",
         data: renewedLicense,
         renewalDetails: {
           previousExpiry: existingLicense.expiresAt,
           newExpiry: newExpiry,
-          renewalPeriod: renewalPeriod
-        }
+          renewalPeriod: renewalPeriod,
+        },
       },
       { status: 200 }
     );
-
   } catch (error) {
     return errorHandler(error);
   }
@@ -117,23 +115,23 @@ export async function GET(
         vendor: {
           select: {
             name: true,
-            businessName: true
-          }
-        }
-      }
+            businessName: true,
+          },
+        },
+      },
     });
 
     if (!license) {
-      return NextResponse.json(
-        { error: 'License not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "License not found" }, { status: 404 });
     }
 
     // Check renewal eligibility
-    const isEligible = ['APPROVED', 'EXPIRED'].includes(license.status);
-    const daysUntilExpiry = license.expiresAt 
-      ? Math.ceil((new Date(license.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    const isEligible = ["APPROVED", "EXPIRED"].includes(license.status);
+    const daysUntilExpiry = license.expiresAt
+      ? Math.ceil(
+          (new Date(license.expiresAt).getTime() - Date.now()) /
+            (1000 * 60 * 60 * 24)
+        )
       : null;
 
     const renewalInfo = {
@@ -141,19 +139,19 @@ export async function GET(
       currentStatus: license.status,
       expiresAt: license.expiresAt,
       daysUntilExpiry,
-      canRenew: isEligible && (daysUntilExpiry === null || daysUntilExpiry <= 30), // Allow renewal 30 days before expiry
-      message: !isEligible 
+      canRenew:
+        isEligible && (daysUntilExpiry === null || daysUntilExpiry <= 30), // Allow renewal 30 days before expiry
+      message: !isEligible
         ? `License cannot be renewed. Current status: ${license.status}`
         : daysUntilExpiry && daysUntilExpiry > 30
-        ? `License can be renewed in ${daysUntilExpiry - 30} days`
-        : 'License is eligible for renewal'
+          ? `License can be renewed in ${daysUntilExpiry - 30} days`
+          : "License is eligible for renewal",
     };
 
     return NextResponse.json({
       data: license,
-      renewalEligibility: renewalInfo
+      renewalEligibility: renewalInfo,
     });
-
   } catch (error) {
     return errorHandler(error);
   }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../../../../node_modules/.prisma/client";
 import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();

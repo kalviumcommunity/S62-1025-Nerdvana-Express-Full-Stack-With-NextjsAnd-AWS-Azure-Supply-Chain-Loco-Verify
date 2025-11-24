@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/HP/Downloads/S62-1025-Nerdvana-Express-Full-Stack-With-NextjsAnd-AWS-Azure-Supply-Chain-Loco-Verify/client/src/app/static/vendors/page.tsx"],"sourcesContent":["// client/src/app/static/vendors/page.tsx\r\n\r\nexport const revalidate = false; // Build-time static\r\n\r\nexport default function VendorsStaticPage() {\r\n  const vendorTypes = [\r\n    \"Tea Stall\",\r\n    \"Book Stall\",\r\n    \"Snack Vendor\",\r\n    \"Water Bottle Vendor\",\r\n    \"Local Food Vendor\",\r\n  ];\r\n\r\n  return (\r\n    <div style={{ padding: 20 }}>\r\n      <h1>Static Rendering — Vendor Categories</h1>\r\n      <p>This page was generated at build time.</p>\r\n\r\n      <ul>\r\n        {vendorTypes.map((v) => (\r\n          <li key={v}>{v}</li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"],"names":[],"mappings":"AAAA,yCAAyC;;;;;;;;;AAElC,MAAM,aAAa,OAAO,oBAAoB;AAEtC,SAAS;IACtB,MAAM,cAAc;QAClB;QACA;QACA;QACA;QACA;KACD;IAED,qBACE,wPAAC;QAAI,OAAO;YAAE,SAAS;QAAG;;0BACxB,wPAAC;0BAAG;;;;;;0BACJ,wPAAC;0BAAE;;;;;;0BAEH,wPAAC;0BACE,YAAY,GAAG,CAAC,CAAC,kBAChB,wPAAC;kCAAY;uBAAJ;;;;;;;;;;;;;;;;AAKnB","debugId":null}}]
-}

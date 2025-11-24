@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, LicenseStatus } from '@prisma/client';
-import { errorHandler } from '@/lib/errorHandler';
-import { authMiddleware } from '@/lib/authMiddleware';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, LicenseStatus } from "@prisma/client";
+import { errorHandler } from "@/lib/errorHandler";
+import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
@@ -26,21 +26,17 @@ export async function GET(
             name: true,
             email: true,
             businessName: true,
-            phone: true
-          }
-        }
-      }
+            phone: true,
+          },
+        },
+      },
     });
 
     if (!license) {
-      return NextResponse.json(
-        { error: 'License not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "License not found" }, { status: 404 });
     }
 
     return NextResponse.json({ data: license });
-
   } catch (error) {
     return errorHandler(error);
   }
@@ -53,7 +49,7 @@ export async function PUT(
 ) {
   try {
     // Apply authentication middleware - only officials can update licenses
-    const authResponse = await authMiddleware(request, ['OFFICIAL']);
+    const authResponse = await authMiddleware(request, ["OFFICIAL"]);
     if (authResponse) return authResponse;
 
     const licenseId = params.id;
@@ -61,20 +57,17 @@ export async function PUT(
 
     // Check if license exists
     const existingLicense = await prisma.license.findUnique({
-      where: { id: licenseId }
+      where: { id: licenseId },
     });
 
     if (!existingLicense) {
-      return NextResponse.json(
-        { error: 'License not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "License not found" }, { status: 404 });
     }
 
     // Validate status if provided
     if (body.status && !Object.values(LicenseStatus).includes(body.status)) {
       return NextResponse.json(
-        { error: 'Invalid license status' },
+        { error: "Invalid license status" },
         { status: 400 }
       );
     }
@@ -89,24 +82,23 @@ export async function PUT(
         validityPeriod: body.validityPeriod,
         documents: body.documents,
         reviewedBy: body.reviewedBy,
-        reviewedAt: body.status ? new Date() : undefined // Auto-set review date on status change
+        reviewedAt: body.status ? new Date() : undefined, // Auto-set review date on status change
       },
       include: {
         vendor: {
           select: {
             name: true,
             businessName: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({
-      message: 'License updated successfully',
-      data: updatedLicense
+      message: "License updated successfully",
+      data: updatedLicense,
     });
-
   } catch (error) {
     return errorHandler(error);
   }
@@ -119,32 +111,28 @@ export async function DELETE(
 ) {
   try {
     // Apply authentication middleware - only officials can delete
-    const authResponse = await authMiddleware(request, ['OFFICIAL']);
+    const authResponse = await authMiddleware(request, ["OFFICIAL"]);
     if (authResponse) return authResponse;
 
     const licenseId = params.id;
 
     // Check if license exists
     const existingLicense = await prisma.license.findUnique({
-      where: { id: licenseId }
+      where: { id: licenseId },
     });
 
     if (!existingLicense) {
-      return NextResponse.json(
-        { error: 'License not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "License not found" }, { status: 404 });
     }
 
     // Delete license
     await prisma.license.delete({
-      where: { id: licenseId }
+      where: { id: licenseId },
     });
 
     return NextResponse.json({
-      message: 'License deleted successfully'
+      message: "License deleted successfully",
     });
-
   } catch (error) {
     return errorHandler(error);
   }

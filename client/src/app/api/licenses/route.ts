@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, LicenseStatus } from '@prisma/client';
-import { errorHandler } from '@/lib/errorHandler';
-import { authMiddleware } from '@/lib/authMiddleware';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, LicenseStatus } from "@prisma/client";
+import { errorHandler } from "@/lib/errorHandler";
+import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
@@ -14,14 +14,17 @@ export async function GET(request: NextRequest) {
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
-    const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 10;
-    const status = searchParams.get('status') as LicenseStatus;
-    const vendorId = searchParams.get('vendorId');
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const status = searchParams.get("status") as LicenseStatus;
+    const vendorId = searchParams.get("vendorId");
     const skip = (page - 1) * limit;
 
     // Build where clause for filtering
-    const where: any = {};
+    const where: {
+      status?: LicenseStatus;
+      vendorId?: string;
+    } = {};
     if (status) where.status = status;
     if (vendorId) where.vendorId = vendorId;
 
@@ -36,11 +39,11 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             businessName: true,
-            email: true
-          }
-        }
+            email: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     // Get total count for pagination info
@@ -52,14 +55,13 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / limit),
       },
       filters: {
         status,
-        vendorId
-      }
+        vendorId,
+      },
     });
-
   } catch (error) {
     return errorHandler(error);
   }
@@ -69,7 +71,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Apply authentication middleware - allow both officials and vendors
-    const authResponse = await authMiddleware(request, ['OFFICIAL', 'VENDOR']);
+    const authResponse = await authMiddleware(request, ["OFFICIAL", "VENDOR"]);
     if (authResponse) return authResponse;
 
     const body = await request.json();
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest) {
     // Basic validation
     if (!body.vendorId || !body.licenseType) {
       return NextResponse.json(
-        { error: 'Vendor ID and license type are required' },
+        { error: "Vendor ID and license type are required" },
         { status: 400 }
       );
     }
@@ -89,27 +91,26 @@ export async function POST(request: NextRequest) {
         licenseType: body.licenseType,
         station: body.station,
         validityPeriod: body.validityPeriod || 12,
-        status: body.status || 'PENDING',
-        documents: body.documents || []
+        status: body.status || "PENDING",
+        documents: body.documents || [],
       },
       include: {
         vendor: {
           select: {
             name: true,
-            businessName: true
-          }
-        }
-      }
+            businessName: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(
-      { 
-        message: 'License created successfully',
-        data: license 
+      {
+        message: "License created successfully",
+        data: license,
       },
       { status: 201 }
     );
-
   } catch (error) {
     return errorHandler(error);
   }

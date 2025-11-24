@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient, LicenseStatus } from '@prisma/client';
-import { errorHandler } from '@/lib/errorHandler';
-import { authMiddleware } from '@/lib/authMiddleware';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, LicenseStatus } from "@prisma/client";
+import { errorHandler } from "@/lib/errorHandler";
+import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
@@ -19,26 +19,26 @@ export async function GET(
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
-    const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 10;
-    const status = searchParams.get('status') as LicenseStatus;
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
+    const status = searchParams.get("status") as LicenseStatus;
     const skip = (page - 1) * limit;
 
     // Check if vendor exists
     const vendor = await prisma.vendor.findUnique({
       where: { id: vendorId },
-      select: { id: true, name: true, businessName: true }
+      select: { id: true, name: true, businessName: true },
     });
 
     if (!vendor) {
-      return NextResponse.json(
-        { error: 'Vendor not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
     }
 
     // Build where clause for filtering
-    const where: any = { vendorId };
+    const where: {
+      vendorId: string;
+      status?: LicenseStatus;
+    } = { vendorId };
     if (status) where.status = status;
 
     // Fetch vendor's licenses with pagination
@@ -54,9 +54,9 @@ export async function GET(
         validityPeriod: true,
         createdAt: true,
         expiresAt: true,
-        reviewedAt: true
+        reviewedAt: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     // Get total count for pagination
@@ -64,33 +64,35 @@ export async function GET(
 
     // Get license statistics
     const stats = await prisma.license.groupBy({
-      by: ['status'],
+      by: ["status"],
       where: { vendorId },
       _count: {
-        status: true
-      }
+        status: true,
+      },
     });
 
     return NextResponse.json({
       vendor: {
         id: vendor.id,
         name: vendor.name,
-        businessName: vendor.businessName
+        businessName: vendor.businessName,
       },
       data: licenses,
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        pages: Math.ceil(total / limit),
       },
-      statistics: stats.reduce((acc, stat) => {
-        acc[stat.status] = stat._count.status;
-        return acc;
-      }, {} as Record<string, number>),
-      filters: { status }
+      statistics: stats.reduce(
+        (acc, stat) => {
+          acc[stat.status] = stat._count.status;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      filters: { status },
     });
-
   } catch (error) {
     return errorHandler(error);
   }
@@ -111,20 +113,17 @@ export async function POST(
 
     // Check if vendor exists
     const vendor = await prisma.vendor.findUnique({
-      where: { id: vendorId }
+      where: { id: vendorId },
     });
 
     if (!vendor) {
-      return NextResponse.json(
-        { error: 'Vendor not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 });
     }
 
     // Basic validation
     if (!body.licenseType) {
       return NextResponse.json(
-        { error: 'License type is required' },
+        { error: "License type is required" },
         { status: 400 }
       );
     }
@@ -136,27 +135,26 @@ export async function POST(
         licenseType: body.licenseType,
         station: body.station,
         validityPeriod: body.validityPeriod || 12,
-        status: 'PENDING',
-        documents: body.documents || []
+        status: "PENDING",
+        documents: body.documents || [],
       },
       include: {
         vendor: {
           select: {
             name: true,
-            businessName: true
-          }
-        }
-      }
+            businessName: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(
-      { 
-        message: 'License created for vendor successfully',
-        data: license 
+      {
+        message: "License created for vendor successfully",
+        data: license,
       },
       { status: 201 }
     );
-
   } catch (error) {
     return errorHandler(error);
   }
