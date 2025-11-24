@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('Vendor', 'Official');
+CREATE TYPE "Role" AS ENUM ('VENDOR', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "LicenseStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'EXPIRED');
@@ -12,7 +12,7 @@ CREATE TABLE "User" (
     "name" TEXT,
     "phone" TEXT,
     "shopName" TEXT,
-    "role" "Role" NOT NULL DEFAULT 'Vendor',
+    "role" "Role" NOT NULL DEFAULT 'VENDOR',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -41,6 +41,12 @@ CREATE INDEX "License_vendorId_idx" ON "License"("vendorId");
 
 -- CreateIndex
 CREATE INDEX "License_status_idx" ON "License"("status");
+
+-- CreateIndex
+CREATE INDEX "License_licenseType_idx" ON "License"("licenseType");
+
+-- CreateIndex
+CREATE INDEX "License_applicationDate_idx" ON "License"("applicationDate");
 
 -- AddForeignKey
 ALTER TABLE "License" ADD CONSTRAINT "License_vendorId_fkey" FOREIGN KEY ("vendorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

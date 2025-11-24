@@ -1,52 +1,54 @@
-import { PrismaClient, Role } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
+import { NextResponse, NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { handleError } from "@/lib/errorHandler";
 
-const prisma = new PrismaClient();
+// The middleware attaches headers x-user-id and x-user-role
+// So we can read them directly here.
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { vendorId, licenseType } = await req.json();
+    const vendorId = req.headers.get("x-user-id");
+    const role = req.headers.get("x-user-role");
 
-    const result = await prisma.$transaction(async (tx) => {
-      // ✅ Step 1 — ensure vendor exists
-      const vendor = await tx.user.findUnique({ where: { id: vendorId } });
-      if (!vendor) {
-        const error = new Error("Vendor not found");
-        error.name = "NotFoundError";
-        throw error;
-      }
+    if (!vendorId) {
+      return NextResponse.json(
+        { error: "Authorization required" },
+        { status: 401 }
+      );
+    }
 
-      // ✅ business rule: Only vendors can apply
-      if (vendor.role !== Role.VENDOR) {
-        const error = new Error("Only Vendors can apply");
-        error.name = "ValidationError";
-        throw error;
-      }
+    if (role !== "Vendor" && role !== "VENDOR") {
+      return NextResponse.json(
+        { error: "Only vendors can apply" },
+        { status: 403 }
+      );
+    }
 
-      // ✅ Step 2 — create license
-      const license = await tx.license.create({
-        data: {
-          vendorId,
-          licenseType,
-        },
-      });
+    const body = await req.json();
+    const { licenseType, shopName, contactName, contactEmail, contactPhone } =
+      body;
 
-      // ❌ Force rollback example
-      if (licenseType === "INVALID") {
-        const error = new Error("Forced rollback test");
-        error.name = "ValidationError";
-        throw error;
-      }
+    if (!licenseType) {
+      return NextResponse.json(
+        { error: "License type is required" },
+        { status: 400 }
+      );
+    }
 
-      return license;
+    // Create license record
+    const license = await prisma.license.create({
+      data: {
+        vendorId,
+        licenseType,
+        shopName,
+        contactName,
+        contactEmail,
+        contactPhone,
+      },
     });
 
-    return NextResponse.json(
-      { success: true, license: result },
-      { status: 201 }
-    );
+    return NextResponse.json({ id: license.id }, { status: 201 });
   } catch (error) {
-    return handleError(error, "POST /api/licenses/apply"); // REPLACE ERROR HANDLING
+    return handleError(error, "POST /api/licenses/apply");
   }
 }
