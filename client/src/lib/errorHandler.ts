@@ -19,11 +19,11 @@ export function handleError(error: unknown, context: string) {
     errorMessage = error.message;
 
     // Handle different error types
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       statusCode = 400;
-    } else if (error.name === 'NotFoundError') {
+    } else if (error.name === "NotFoundError") {
       statusCode = 404;
-    } else if (error.name === 'UnauthorizedError') {
+    } else if (error.name === "UnauthorizedError") {
       statusCode = 401;
     }
   }
@@ -36,9 +36,7 @@ export function handleError(error: unknown, context: string) {
     details?: unknown;
   } = {
     success: false,
-    message: isProd 
-      ? getProductionMessage(statusCode)
-      : errorMessage,
+    message: isProd ? getProductionMessage(statusCode) : errorMessage,
   };
 
   // Include stack trace only in development
@@ -55,9 +53,13 @@ export function handleError(error: unknown, context: string) {
   logger.error(`Error in ${context}`, {
     message: errorMessage,
     statusCode: statusCode,
-    stack: isProd ? "REDACTED" : (error instanceof Error ? error.stack : "No stack"),
+    stack: isProd
+      ? "REDACTED"
+      : error instanceof Error
+        ? error.stack
+        : "No stack",
     context: context,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   return NextResponse.json(errorResponse, { status: statusCode });
@@ -71,8 +73,10 @@ function getProductionMessage(statusCode: number): string {
     403: "You don't have permission to access this resource.",
     404: "The requested resource was not found.",
     500: "Something went wrong. Please try again later.",
-    503: "Service temporarily unavailable. Please try again later."
+    503: "Service temporarily unavailable. Please try again later.",
   };
 
-  return messages[statusCode] || "Something went wrong. Please try again later.";
+  return (
+    messages[statusCode] || "Something went wrong. Please try again later."
+  );
 }

@@ -23,7 +23,7 @@ export async function GET(request: Request) {
         email: string;
         role: string;
       };
-    } catch  {
+    } catch {
       const error = new Error("Invalid or expired token");
       error.name = "UnauthorizedError";
       throw error;
