@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, Role } from "../../../../../node_modules/.prisma/client";
 import { handleError } from "../../../../lib/errorHandler"; // ADD THIS IMPORT
 
 const prisma = new PrismaClient();
