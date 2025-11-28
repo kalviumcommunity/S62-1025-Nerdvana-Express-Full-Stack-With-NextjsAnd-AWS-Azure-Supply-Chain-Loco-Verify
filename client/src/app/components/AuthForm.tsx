@@ -29,7 +29,7 @@ export default function AuthForm({ type }: AuthFormProps) {
     setError("");
     setLoading(true);
 
-    const url = isLogin ? "/api/auth/login" : "/api/auth/register";
+    const url = isLogin ? "/api/auth/login" : "/api/auth/signup";
 
     try {
       const res = await fetch(url, {
@@ -60,7 +60,7 @@ export default function AuthForm({ type }: AuthFormProps) {
   };
 
   return (
-    <div className="bg-white shadow-lg p-8 rounded-xl w-full max-w-md">
+    <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl p-8 rounded-2xl w-full max-w-md">
       <h1 className="text-3xl font-bold mb-4 text-center">
         {isLogin ? "Login" : "Vendor Registration"}
       </h1>

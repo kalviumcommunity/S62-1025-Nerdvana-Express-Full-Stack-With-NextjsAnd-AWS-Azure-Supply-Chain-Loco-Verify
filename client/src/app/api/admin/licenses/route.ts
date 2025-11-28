@@ -1,53 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, LicenseStatus } from "@prisma/client";
-import { errorHandler } from "@/lib/errorHandler";
+import { handleError } from "@/lib/errorHandler";
 import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
-// GET /api/admin/licenses - Get licenses with admin filters and approval queue
+// GET /api/admin/licenses
 export async function GET(request: NextRequest) {
   try {
-    // Apply authentication middleware - admin only
-    const authResponse = await authMiddleware(request, ["OFFICIAL"]);
+    const authResponse = await authMiddleware(request, ["ADMIN"]);
     if (authResponse) return authResponse;
 
-    // Get query parameters
     const { searchParams } = new URL(request.url);
+
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
-    const status = searchParams.get("status") as LicenseStatus;
-    const type = searchParams.get("type");
-    const needsAttention = searchParams.get("needsAttention") === "true";
     const skip = (page - 1) * limit;
 
-    // Build where clause for admin filtering
-    const where: {
-      status?: LicenseStatus;
-      licenseType?: string;
-      OR?: Array<{
-        status?: "PENDING" | "PENDING_RENEWAL";
-        expiresAt?: { lte: Date };
-      }>;
-    } = {};
+    const status = searchParams.get("status") as LicenseStatus | null;
+    const type = searchParams.get("type") || null;
+    const needsAttention = searchParams.get("needsAttention") === "true";
+
+    const where: any = {};
     if (status) where.status = status;
     if (type) where.licenseType = type;
 
-    // Filter for licenses needing attention (expiring soon or pending)
     if (needsAttention) {
       where.OR = [
         { status: "PENDING" },
-        { status: "PENDING_RENEWAL" },
         {
           status: "APPROVED",
-          expiresAt: {
-            lte: new Date(new Date().setDate(new Date().getDate() + 30)), // Expiring in 30 days
+          expiryDate: {
+            lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
         },
       ];
     }
 
-    // Fetch licenses with admin details
     const licenses = await prisma.license.findMany({
       skip,
       take: limit,
@@ -57,45 +46,38 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             name: true,
-            businessName: true,
+            shopName: true,
             email: true,
             phone: true,
           },
         },
       },
       orderBy: needsAttention
-        ? [{ status: "asc" }, { expiresAt: "asc" }]
-        : { createdAt: "desc" },
+        ? [{ status: "asc" }, { expiryDate: "asc" }]
+        : { applicationDate: "desc" },
     });
 
-    // Get total count and statistics
     const total = await prisma.license.count({ where });
 
     const statusStats = await prisma.license.groupBy({
       by: ["status"],
-      _count: {
-        status: true,
-      },
+      _count: { status: true },
     });
 
     const typeStats = await prisma.license.groupBy({
       by: ["licenseType"],
-      _count: {
-        licenseType: true,
-      },
+      _count: { licenseType: true },
     });
 
-    // Get approval queue count
     const pendingCount = await prisma.license.count({
-      where: { status: { in: ["PENDING", "PENDING_RENEWAL"] } },
+      where: { status: "PENDING" },
     });
 
-    // Get expiring soon count
     const expiringSoonCount = await prisma.license.count({
       where: {
         status: "APPROVED",
-        expiresAt: {
-          lte: new Date(new Date().setDate(new Date().getDate() + 30)),
+        expiryDate: {
+          lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         },
       },
     });
@@ -115,30 +97,23 @@ export async function GET(request: NextRequest) {
         expiringSoonCount,
         totalLicenses: total,
       },
-      filters: {
-        status,
-        type,
-        needsAttention,
-      },
     });
   } catch (error) {
-    return errorHandler(error);
+    return handleError(error, "GET /api/admin/licenses");
   }
 }
 
-// POST /api/admin/licenses/bulk-action - Bulk approve/reject licenses
+// POST /api/admin/licenses
 export async function POST(request: NextRequest) {
   try {
-    // Apply authentication middleware - admin only
-    const authResponse = await authMiddleware(request, ["OFFICIAL"]);
+    const authResponse = await authMiddleware(request, ["ADMIN"]);
     if (authResponse) return authResponse;
 
-    const body = await request.json();
-    const { licenseIds, action, reason } = body;
+    const { licenseIds, action } = await request.json();
 
-    if (!licenseIds || !Array.isArray(licenseIds) || !action) {
+    if (!Array.isArray(licenseIds) || !action) {
       return NextResponse.json(
-        { error: "License IDs array and action are required" },
+        { error: "licenseIds[] and action are required" },
         { status: 400 }
       );
     }
@@ -152,28 +127,21 @@ export async function POST(request: NextRequest) {
 
     const newStatus = action === "APPROVE" ? "APPROVED" : "REJECTED";
 
-    // Update licenses in bulk
     const result = await prisma.license.updateMany({
       where: {
         id: { in: licenseIds },
-        status: { in: ["PENDING", "PENDING_RENEWAL"] }, // Only update pending licenses
+        status: "PENDING",
       },
       data: {
         status: newStatus,
-        reviewedAt: new Date(),
-        reviewNotes: reason || `Bulk ${action.toLowerCase()}ed`,
       },
     });
 
     return NextResponse.json({
-      message: `Successfully ${action.toLowerCase()}d ${result.count} licenses`,
-      data: {
-        action,
-        processedCount: result.count,
-        totalRequested: licenseIds.length,
-      },
+      message: `Updated ${result.count} licenses`,
+      updated: result.count,
     });
   } catch (error) {
-    return errorHandler(error);
+    return handleError(error, "POST /api/admin/licenses");
   }
 }

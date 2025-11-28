@@ -2,12 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import StatusBadge from "@/components/StatusBadge";
+import {
+  User,
+  FileText,
+  ShieldCheck,
+  ArrowRight,
+  LogOut,
+  Upload,
+  CheckCircle,
+} from "lucide-react";
 
 export default function VendorDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [licenses, setLicenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Load user + fetch license data
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
@@ -17,72 +29,186 @@ export default function VendorDashboard() {
       return;
     }
 
-    setUser(JSON.parse(storedUser));
-    setLoading(false);
+    const parsedUser = JSON.parse(storedUser);
+    setUser(parsedUser);
+
+    // Fetch vendor licenses
+    fetch(`/api/licenses?vendorId=${parsedUser.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLicenses(data?.data || []);
+        setLoading(false);
+      });
   }, [router]);
 
-  if (loading) return <div className="p-10 text-center">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center text-gray-300 p-10">Loading Dashboard…</div>
+    );
+
+  const latest = licenses[0];
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8 border">
-      {/* Welcome Header */}
-      <h1 className="text-3xl font-bold text-gray-900">Welcome, {user.name}</h1>
-      <p className="text-gray-500 mt-1">Vendor Dashboard</p>
+    <div className="min-h-screen bg-gray-950 text-white px-6 pt-32 pb-20">
+      {/* Page Title */}
+      <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text mb-10">
+        Vendor Dashboard
+      </h1>
 
-      {/* Profile Section */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-5 border rounded-xl bg-gray-50">
-          <h2 className="text-lg font-semibold">Your Profile</h2>
-          <p className="mt-3 text-gray-700">
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p className="text-gray-700">
-            <strong>Phone:</strong> {user.phone || "N/A"}
-          </p>
-          <p className="text-gray-700">
-            <strong>Shop Name:</strong> {user.shopName}
-          </p>
+      {/* GRID SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Profile Card */}
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 shadow-xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center">
+              <User className="text-blue-400 h-6 w-6" />
+            </div>
+            <h2 className="text-xl font-semibold">Your Profile</h2>
+          </div>
+
+          <div className="space-y-3 text-gray-300">
+            <p>
+              <span className="text-gray-400">Name:</span> {user.name}
+            </p>
+            <p>
+              <span className="text-gray-400">Email:</span> {user.email}
+            </p>
+            <p>
+              <span className="text-gray-400">Phone:</span>{" "}
+              {user.phone ?? "N/A"}
+            </p>
+            <p>
+              <span className="text-gray-400">Shop:</span> {user.shopName}
+            </p>
+          </div>
         </div>
 
-        {/* License Status Box */}
-        <div className="p-5 border rounded-xl bg-gray-50">
-          <h2 className="text-lg font-semibold">License Status</h2>
-          <p className="mt-3 text-gray-700">
-            Currently:{" "}
-            <span className="font-bold text-blue-600">
-              {user.licenseStatus || "No application yet"}
-            </span>
-          </p>
+        {/* License Summary */}
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 shadow-xl">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-purple-600/20 rounded-xl flex items-center justify-center">
+              <ShieldCheck className="text-purple-400 h-6 w-6" />
+            </div>
+            <h2 className="text-xl font-semibold">Your License Status</h2>
+          </div>
+
+          {/* No license yet */}
+          {!latest ? (
+            <div className="text-gray-400 mb-6">
+              You haven't applied for any license yet.
+            </div>
+          ) : (
+            <div className="space-y-3 mb-6">
+              <p>
+                <span className="text-gray-400">License Type:</span>{" "}
+                {latest.licenseType}
+              </p>
+
+              <p className="flex items-center gap-2">
+                <span className="text-gray-400">Status:</span>
+                <StatusBadge status={latest.status} />
+              </p>
+
+              {latest.issueDate && (
+                <p>
+                  <span className="text-gray-400">Issued:</span>{" "}
+                  {new Date(latest.issueDate).toLocaleDateString()}
+                </p>
+              )}
+
+              {latest.expiryDate && (
+                <p>
+                  <span className="text-gray-400">Expires:</span>{" "}
+                  {new Date(latest.expiryDate).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            {!latest && (
+              <button
+                onClick={() => router.push("/vendor/apply")}
+                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition flex items-center gap-2"
+              >
+                Apply for License <ArrowRight className="h-5 w-5" />
+              </button>
+            )}
+
+            {/* Renewal button if approved */}
+            {latest?.status === "APPROVED" && (
+              <button
+                onClick={() => router.push("/vendor/renew")}
+                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition flex items-center gap-2"
+              >
+                Renew License <CheckCircle className="h-5 w-5" />
+              </button>
+            )}
+
+            <button
+              onClick={() => router.push("/vendor/upload")}
+              className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-xl hover:bg-gray-900 transition flex items-center gap-2"
+            >
+              Upload Documents <Upload className="h-5 w-5" />
+            </button>
+
+            <button
+              onClick={() => {
+                localStorage.clear();
+                router.push("/vendor/login");
+              }}
+              className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition flex items-center gap-2"
+            >
+              Logout <LogOut className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-10 flex flex-col md:flex-row gap-4">
-        <button
-          onClick={() => router.push("/vendor/apply")}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
-        >
-          Apply for License
-        </button>
+      {/* DOCUMENTS SECTION */}
+      {latest && (
+        <div className="mt-12 p-6 rounded-2xl bg-gray-900 border border-gray-800 shadow-xl">
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <FileText className="h-6 w-6 text-blue-400" />
+            Submitted Documents
+          </h2>
 
-        <button
-          onClick={() => router.push("/vendor/upload")}
-          className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-xl hover:bg-gray-900 transition"
-        >
-          Upload Documents
-        </button>
+          <div className="space-y-2 text-gray-300">
+            <p>
+              <span className="text-gray-400">ID Proof:</span>{" "}
+              {latest.idProofLink ? (
+                <a
+                  href={latest.idProofLink}
+                  target="_blank"
+                  className="text-blue-400 hover:underline"
+                >
+                  View File
+                </a>
+              ) : (
+                "Not uploaded"
+              )}
+            </p>
 
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            router.push("/vendor/login");
-          }}
-          className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition"
-        >
-          Logout
-        </button>
-      </div>
+            <p>
+              <span className="text-gray-400">Shop Photo:</span>{" "}
+              {latest.shopPhotoLink ? (
+                <a
+                  href={latest.shopPhotoLink}
+                  target="_blank"
+                  className="text-blue-400 hover:underline"
+                >
+                  View File
+                </a>
+              ) : (
+                "Not uploaded"
+              )}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

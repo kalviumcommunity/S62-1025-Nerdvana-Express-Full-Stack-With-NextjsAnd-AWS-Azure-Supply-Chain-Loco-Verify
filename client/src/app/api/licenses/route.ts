@@ -1,34 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, LicenseStatus } from "@prisma/client";
-import { errorHandler } from "@/lib/errorHandler";
+import { handleError } from "@/lib/errorHandler";
 import { authMiddleware } from "@/lib/authMiddleware";
 
 const prisma = new PrismaClient();
 
-// GET /api/licenses - List all licenses with pagination and filtering
+// =============================
+// GET /api/licenses
+// =============================
 export async function GET(request: NextRequest) {
   try {
-    // Apply authentication middleware
-    const authResponse = await authMiddleware(request);
+    // Allow both vendor and admin to fetch licenses
+    const authResponse = await authMiddleware(request, ["ADMIN", "VENDOR"]);
     if (authResponse) return authResponse;
 
-    // Get query parameters
     const { searchParams } = new URL(request.url);
+
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
-    const status = searchParams.get("status") as LicenseStatus;
-    const vendorId = searchParams.get("vendorId");
     const skip = (page - 1) * limit;
 
-    // Build where clause for filtering
-    const where: {
-      status?: LicenseStatus;
-      vendorId?: string;
-    } = {};
+    const status = searchParams.get("status") as LicenseStatus | null;
+    const vendorId = searchParams.get("vendorId") || null;
+
+    const where: any = {};
     if (status) where.status = status;
     if (vendorId) where.vendorId = vendorId;
 
-    // Fetch licenses with pagination and filtering
     const licenses = await prisma.license.findMany({
       skip,
       take: limit,
@@ -38,15 +36,15 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             name: true,
-            businessName: true,
+            shopName: true,
             email: true,
+            phone: true,
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { applicationDate: "desc" },
     });
 
-    // Get total count for pagination info
     const total = await prisma.license.count({ where });
 
     return NextResponse.json({
@@ -57,48 +55,50 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit),
       },
-      filters: {
-        status,
-        vendorId,
-      },
+      filters: { status, vendorId },
     });
   } catch (error) {
-    return errorHandler(error);
+    return handleError(error, "GET /api/licenses");
   }
 }
 
-// POST /api/licenses - Simple license creation (for admin/official use)
+// =============================
+// POST /api/licenses
+// (Simple create — NOT apply flow)
+// =============================
 export async function POST(request: NextRequest) {
   try {
-    // Apply authentication middleware - allow both officials and vendors
-    const authResponse = await authMiddleware(request, ["OFFICIAL", "VENDOR"]);
+    // Only admin can create license manually
+    const authResponse = await authMiddleware(request, ["ADMIN"]);
     if (authResponse) return authResponse;
 
     const body = await request.json();
 
-    // Basic validation
-    if (!body.vendorId || !body.licenseType) {
+    const { vendorId, licenseType, idProofLink, shopPhotoLink } = body;
+
+    if (!vendorId || !licenseType) {
       return NextResponse.json(
-        { error: "Vendor ID and license type are required" },
+        { message: "vendorId and licenseType are required" },
         { status: 400 }
       );
     }
 
-    // Create new license (simpler version without the complex business logic in apply/)
     const license = await prisma.license.create({
       data: {
-        vendorId: body.vendorId,
-        licenseType: body.licenseType,
-        station: body.station,
-        validityPeriod: body.validityPeriod || 12,
-        status: body.status || "PENDING",
-        documents: body.documents || [],
+        vendorId,
+        licenseType,
+        status: "PENDING",
+        idProofLink: idProofLink || null,
+        shopPhotoLink: shopPhotoLink || null,
       },
       include: {
         vendor: {
           select: {
+            id: true,
             name: true,
-            businessName: true,
+            shopName: true,
+            email: true,
+            phone: true,
           },
         },
       },
@@ -112,6 +112,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    return errorHandler(error);
+    return handleError(error, "POST /api/licenses");
   }
 }
