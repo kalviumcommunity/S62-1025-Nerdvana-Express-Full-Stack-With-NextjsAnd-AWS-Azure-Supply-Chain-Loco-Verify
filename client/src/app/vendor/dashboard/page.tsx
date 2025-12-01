@@ -33,7 +33,7 @@ export default function VendorDashboard() {
     setUser(parsedUser);
 
     // Fetch vendor licenses
-    fetch(`/api/licenses?vendorId=${parsedUser.id}`, {
+    fetch(`/api/licenses/vendor`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -184,6 +184,7 @@ export default function VendorDashboard() {
                   href={latest.idProofLink}
                   target="_blank"
                   className="text-blue-400 hover:underline"
+                  rel="noreferrer"
                 >
                   View File
                 </a>
@@ -199,6 +200,7 @@ export default function VendorDashboard() {
                   href={latest.shopPhotoLink}
                   target="_blank"
                   className="text-blue-400 hover:underline"
+                  rel="noreferrer"
                 >
                   View File
                 </a>

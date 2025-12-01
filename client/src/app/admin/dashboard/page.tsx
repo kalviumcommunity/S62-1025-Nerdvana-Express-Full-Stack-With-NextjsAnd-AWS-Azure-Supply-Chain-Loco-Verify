@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import StatusBadge from "@/components/StatusBadge";
 import {
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
-  FileCheck,
-  XCircle,
   Clock,
   ShieldCheck,
+  XCircle,
   AlertTriangle,
 } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -24,14 +22,21 @@ export default function AdminDashboard() {
   const [type, setType] = useState("");
   const [needsAttention, setNeedsAttention] = useState(false);
 
-  // Fetch admin license data
+  // Fetch data
   const fetchData = async () => {
     setLoading(true);
+    const token = localStorage.getItem("token");
+
     const url = `/api/admin/licenses?page=${page}&limit=10&status=${status}&type=${type}&needsAttention=${needsAttention}`;
 
-    const res = await fetch(url, { method: "GET" });
-    const json = await res.json();
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    const json = await res.json();
     setData(json);
     setLoading(false);
   };
@@ -43,13 +48,12 @@ export default function AdminDashboard() {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-950 text-white pt-28 px-6 max-w-7xl mx-auto">
-
-        {/* PAGE TITLE */}
+        {/* TITLE */}
         <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           Admin Dashboard
         </h1>
 
-        {/* STATS */}
+        {/* STAT CARDS */}
         {data?.statistics && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
             <StatCard
@@ -61,13 +65,21 @@ export default function AdminDashboard() {
             <StatCard
               icon={<ShieldCheck className="h-8 w-8 text-green-400" />}
               label="Approved"
-              value={data.statistics.byStatus.find((s: any) => s.status === "APPROVED")?._count?.status || 0}
+              value={
+                data.statistics.byStatus.find(
+                  (s: any) => s.status === "APPROVED"
+                )?._count?.status || 0
+              }
               color="green"
             />
             <StatCard
               icon={<XCircle className="h-8 w-8 text-red-400" />}
               label="Rejected"
-              value={data.statistics.byStatus.find((s: any) => s.status === "REJECTED")?._count?.status || 0}
+              value={
+                data.statistics.byStatus.find(
+                  (s: any) => s.status === "REJECTED"
+                )?._count?.status || 0
+              }
               color="red"
             />
             <StatCard
@@ -81,11 +93,10 @@ export default function AdminDashboard() {
 
         {/* FILTERS */}
         <div className="flex flex-wrap gap-4 items-center mb-6">
-          {/* Status filter */}
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="bg-gray-900 border border-gray-700 px-4 py-2 rounded-lg text-gray-300"
+            className="bg-gray-900 border border-gray-700 px-4 py-2 rounded-lg"
           >
             <option value="">All Status</option>
             <option value="PENDING">Pending</option>
@@ -94,22 +105,20 @@ export default function AdminDashboard() {
             <option value="EXPIRED">Expired</option>
           </select>
 
-          {/* Type filter */}
           <input
             placeholder="Filter by type..."
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="bg-gray-900 border border-gray-700 px-4 py-2 rounded-lg text-gray-300"
+            className="bg-gray-900 border border-gray-700 px-4 py-2 rounded-lg"
           />
 
-          {/* Needs attention switch */}
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-gray-400">
             <input
               type="checkbox"
               checked={needsAttention}
               onChange={(e) => setNeedsAttention(e.target.checked)}
             />
-            <span className="text-gray-400">Needs Attention</span>
+            Needs Attention
           </label>
 
           <button
@@ -117,14 +126,14 @@ export default function AdminDashboard() {
               setPage(1);
               fetchData();
             }}
-            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Search className="h-4 w-4" />
             Apply Filters
           </button>
         </div>
 
-        {/* TABLE */}
+        {/* LICENSE TABLE */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-900 border-b border-gray-800 text-gray-400 text-sm">
@@ -140,7 +149,9 @@ export default function AdminDashboard() {
 
             <tbody className="text-gray-300">
               {loading ? (
-                <tr><td className="p-4">Loading...</td></tr>
+                <tr>
+                  <td className="p-4">Loading...</td>
+                </tr>
               ) : data?.data?.length === 0 ? (
                 <tr>
                   <td className="p-6 text-center text-gray-500" colSpan={6}>
@@ -152,12 +163,15 @@ export default function AdminDashboard() {
                   <tr key={l.id} className="border-b border-gray-800">
                     <td className="p-4">{l.vendor?.name || "N/A"}</td>
                     <td className="p-4">{l.licenseType}</td>
+
                     <td className="p-4">
                       <StatusBadge status={l.status} />
                     </td>
 
                     <td className="p-4">
-                      {l.expiresAt ? new Date(l.expiresAt).toLocaleDateString() : "—"}
+                      {l.expiryDate
+                        ? new Date(l.expiryDate).toLocaleDateString()
+                        : "—"}
                     </td>
 
                     <td className="p-4">{l.vendor?.email}</td>
@@ -169,6 +183,7 @@ export default function AdminDashboard() {
                       >
                         Approve
                       </button>
+
                       <button
                         onClick={() => bulkAction([l.id], "REJECT")}
                         className="px-3 py-1 bg-red-600/20 border border-red-500/30 rounded-lg hover:bg-red-600/30"
@@ -191,7 +206,8 @@ export default function AdminDashboard() {
               onClick={() => setPage(page - 1)}
               className="flex items-center gap-1 hover:text-white disabled:opacity-40"
             >
-              <ChevronLeft className="h-4 w-4" /> Prev
+              <ChevronLeft className="h-4 w-4" />
+              Prev
             </button>
 
             <span>
@@ -212,9 +228,11 @@ export default function AdminDashboard() {
   );
 }
 
-// Small Stat Card Component
+/* ------------------------------
+   STAT CARD COMPONENT
+--------------------------------*/
 function StatCard({ icon, label, value, color }: any) {
-  const bgColors: any = {
+  const colors: any = {
     blue: "from-blue-600/20 to-blue-800/10 border-blue-500/20",
     green: "from-green-600/20 to-green-800/10 border-green-500/20",
     red: "from-red-600/20 to-red-800/10 border-red-500/20",
@@ -223,7 +241,7 @@ function StatCard({ icon, label, value, color }: any) {
 
   return (
     <div
-      className={`p-6 rounded-2xl shadow-xl bg-gradient-to-br ${bgColors[color]} border`}
+      className={`p-6 rounded-2xl shadow-xl bg-gradient-to-br ${colors[color]} border`}
     >
       {icon}
       <h3 className="text-3xl font-bold mt-3">{value}</h3>
@@ -232,15 +250,19 @@ function StatCard({ icon, label, value, color }: any) {
   );
 }
 
-// action handler
+/* ------------------------------
+   BULK ACTION HANDLER
+--------------------------------*/
 async function bulkAction(ids: string[], action: string) {
   await fetch("/api/admin/licenses", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
     body: JSON.stringify({
       licenseIds: ids,
       action,
-      reason: `Admin ${action.toLowerCase()}ed`,
     }),
   });
 

@@ -32,7 +32,10 @@ export default function AdminHeader() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/admin/dashboard" className="text-gray-300 hover:text-white transition flex items-center gap-1">
+          <Link
+            href="/admin/dashboard"
+            className="text-gray-300 hover:text-white transition flex items-center gap-1"
+          >
             <LayoutDashboard className="h-4 w-4" /> Dashboard
           </Link>
 
@@ -48,7 +51,10 @@ export default function AdminHeader() {
         </nav>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
+        <button
+          className="md:hidden text-white"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -56,7 +62,10 @@ export default function AdminHeader() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800 p-6 space-y-4">
-          <Link href="/admin/dashboard" className="block text-gray-300 hover:text-white">
+          <Link
+            href="/admin/dashboard"
+            className="block text-gray-300 hover:text-white"
+          >
             Dashboard
           </Link>
 
