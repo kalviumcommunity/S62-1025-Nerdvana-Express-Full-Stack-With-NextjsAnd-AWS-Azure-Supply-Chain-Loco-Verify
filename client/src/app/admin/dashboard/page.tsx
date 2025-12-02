@@ -177,19 +177,23 @@ export default function AdminDashboard() {
                     <td className="p-4">{l.vendor?.email}</td>
 
                     <td className="p-4 text-right space-x-2">
-                      <button
-                        onClick={() => bulkAction([l.id], "APPROVE")}
-                        className="px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-lg hover:bg-green-600/30"
-                      >
-                        Approve
-                      </button>
+                      {l.status !== "APPROVED" && l.status !== "REJECTED" && (
+                        <>
+                          <button
+                            onClick={() => bulkAction([l.id], "APPROVE")}
+                            className="px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-lg hover:bg-green-600/30"
+                          >
+                            Approve
+                          </button>
 
-                      <button
-                        onClick={() => bulkAction([l.id], "REJECT")}
-                        className="px-3 py-1 bg-red-600/20 border border-red-500/30 rounded-lg hover:bg-red-600/30"
-                      >
-                        Reject
-                      </button>
+                          <button
+                            onClick={() => bulkAction([l.id], "REJECT")}
+                            className="px-3 py-1 bg-red-600/20 border border-red-500/30 rounded-lg hover:bg-red-600/30"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))
