@@ -7,16 +7,19 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }   // 👈 FIX IMPORTANT
+  context: { params: Promise<{ id: string }> } // 👈 FIX IMPORTANT
 ) {
   try {
     const authResponse = await authMiddleware(request, ["ADMIN"]);
     if (authResponse) return authResponse;
 
-    const { id } = await context.params;   // 👈 FIX IMPORTANT
+    const { id } = await context.params; // 👈 FIX IMPORTANT
 
     if (!id)
-      return NextResponse.json({ error: "Missing license id" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing license id" },
+        { status: 400 }
+      );
 
     const license = await prisma.license.findUnique({
       where: { id },

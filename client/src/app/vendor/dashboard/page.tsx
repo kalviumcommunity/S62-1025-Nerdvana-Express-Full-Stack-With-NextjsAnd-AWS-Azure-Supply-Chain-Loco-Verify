@@ -33,7 +33,7 @@ export default function VendorDashboard() {
     setUser(parsedUser);
 
     // Fetch vendor licenses
-    fetch(`/api/licenses/vendor`, {
+    fetch("/api/licenses/vendor", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

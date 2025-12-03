@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import StatusBadge from "@/components/StatusBadge";
 import {
   Search,
@@ -14,6 +15,7 @@ import {
 import Layout from "@/components/Layout";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -160,7 +162,11 @@ export default function AdminDashboard() {
                 </tr>
               ) : (
                 data.data.map((l: any) => (
-                  <tr key={l.id} className="border-b border-gray-800">
+                  <tr
+                    key={l.id}
+                    className="border-b border-gray-800 cursor-pointer hover:bg-gray-800/50"
+                    onClick={() => router.push(`/admin/licenses/${l.id}`)}
+                  >
                     <td className="p-4">{l.vendor?.name || "N/A"}</td>
                     <td className="p-4">{l.licenseType}</td>
 
@@ -180,14 +186,20 @@ export default function AdminDashboard() {
                       {l.status !== "APPROVED" && l.status !== "REJECTED" && (
                         <>
                           <button
-                            onClick={() => bulkAction([l.id], "APPROVE")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              bulkAction([l.id], "APPROVE");
+                            }}
                             className="px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-lg hover:bg-green-600/30"
                           >
                             Approve
                           </button>
 
                           <button
-                            onClick={() => bulkAction([l.id], "REJECT")}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              bulkAction([l.id], "REJECT");
+                            }}
                             className="px-3 py-1 bg-red-600/20 border border-red-500/30 rounded-lg hover:bg-red-600/30"
                           >
                             Reject

@@ -1,4 +1,6 @@
-# TODO: Remove Accept/Reject Buttons for Approved/Rejected Licenses
+# TODO: Make License Rows Clickable in Admin Dashboard
 
-- [x] Edit client/src/app/admin/dashboard/page.tsx to conditionally render Approve and Reject buttons only when license status is not APPROVED or REJECTED
-- [x] Start development server and verify buttons are hidden for APPROVED/REJECTED licenses and shown for others
+- [x] Add useRouter import and router instance
+- [ ] Make table rows clickable to redirect to /licenses/[id] page
+- [ ] Add cursor-pointer class for better UX
+- [ ] Test the redirection by clicking on a row

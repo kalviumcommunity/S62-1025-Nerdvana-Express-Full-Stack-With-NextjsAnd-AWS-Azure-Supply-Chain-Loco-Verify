@@ -27,7 +27,10 @@ export async function POST(req: Request) {
     const shopPhotoFile = formData.get("shopPhoto") as File | null;
 
     if (!licenseType || !idProofFile || !shopPhotoFile) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // Helper to save file locally

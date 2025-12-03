@@ -198,6 +198,7 @@ export default function AdminLicenseDetail() {
                     href={license.idProofLink}
                     target="_blank"
                     className="text-blue-400 hover:underline"
+                    rel="noreferrer"
                   >
                     View Document
                   </a>
@@ -213,6 +214,7 @@ export default function AdminLicenseDetail() {
                     href={license.shopPhotoLink}
                     target="_blank"
                     className="text-purple-400 hover:underline"
+                    rel="noreferrer"
                   >
                     View Document
                   </a>
